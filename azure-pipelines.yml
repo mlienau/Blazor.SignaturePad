@@ -37,4 +37,4 @@ steps:
     command: push
     packagesToPush: 'src/bin/Release/*.nupkg'
     nuGetFeedType: external
-    publishFeedCredentials: 'Blazor Signature Pad'
+    publishFeedCredentials: 'Blazor Packages'
