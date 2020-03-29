@@ -3,6 +3,8 @@ A Blazor component library that utilizes [Szymon Nowak](https://github.com/szime
 
 ***Don't worry! You don't have to touch any javascript to make use of this library. Blazor Signature Pad abstracts all of that away for you. Just plug and play, baby.***
 
+#### [Go to Demo](https://mobsites.github.io/Blazor.SignaturePad/)
+
 ![Gif of Demo](src/assets/demo.gif)
 
 ## For
