@@ -1,0 +1,26 @@
+# Copyright (c) 2020 Allan Mobley. All rights reserved.
+# Licensed under the MIT License. See License.txt in the project root for license information.
+  
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+
+# Specify a particular version of the .NET SDK
+- task: UseDotNet@2
+  displayName: 'Use .NET Core sdk'
+  inputs:
+    packageType: sdk
+    version: 3.1.200
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+
+# Build samples. Not strictly required to create the package,
+# but we want the pipeline to halt if these steps fail.
+- script: dotnet build --configuration Release
+  workingDirectory: samples/Blazorwasm
+  displayName: Build
+
+# Create the NuGet package file
+- script: dotnet pack --configuration Release
+  workingDirectory: src
+  displayName: Pack
