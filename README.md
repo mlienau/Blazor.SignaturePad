@@ -1,3 +1,5 @@
+[![Build Status](https://dev.azure.com/allanmobleyjr/Blazor%20Signature%20Pad/_apis/build/status/Mobsites.Blazor.SignaturePad?branchName=master)](https://dev.azure.com/allanmobleyjr/Blazor%20Signature%20Pad/_build/latest?definitionId=6&branchName=master)
+
 # Blazor Signature Pad
 A Blazor component library that utilizes [Szymon Nowak](https://github.com/szimek)'s javascript library [Signature Pad](https://github.com/szimek/signature_pad) to implement smooth signature drawing on a HTML5 canvas.
 
