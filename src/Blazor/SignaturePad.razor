@@ -1,0 +1,23 @@
+<div id="signature-pad" class="signature-pad @Class" @attributes="@ExtraAttributes">
+    <div class="signature-pad--body">
+        @{
+            string style = UseBackgroundImage
+                ? $"background: url({BackgroundImage}) center / {BackgroundImageWidth}px {BackgroundImageHeight}px no-repeat;"
+                : null;
+        }
+        <canvas id="signature-pad--canvas" style="@style"></canvas>
+    </div>
+    @if (!(HideFooterDirective && ChildContent is null))
+    {
+        <div class="signature-pad--footer">
+            @if (!HideFooterDirective)
+            {
+                <div class="signature-pad--footer-description">@FooterDirective</div>
+            }
+            @if (ChildContent != null)
+            {
+                <div class="signature-pad--actions">@ChildContent</div>
+            }
+        </div>
+    }
+</div>

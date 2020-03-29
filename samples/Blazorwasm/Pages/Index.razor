@@ -1,0 +1,35 @@
+@page "/"
+
+<h1>Blazor Signature Pad Demo</h1>
+<SignaturePad UseBackgroundImage @ref="signaturePad" OnChangeCallback="OnSignatureChange">
+    <SignaturePadPen />
+    <SignaturePadClear />
+    <SignaturePadUndo />
+    <SignaturePadSave SaveAsType="signatureType" />
+</SignaturePad>
+<br />
+<h4>Below image and data url are captured using SignaturePad onchange callback event:</h4>
+<select @onchange="OnSignatureChange">
+    <option value="@SignaturePad.SupportedImageTypes.png">PNG</option>
+    <option value="@SignaturePad.SupportedImageTypes.jpg">JPEG</option>
+    <option value="@SignaturePad.SupportedImageTypes.svg">SVG</option>
+</select>
+<br />
+<br />
+<textarea rows="10" class="w-50">@dataURL</textarea><img src="@dataURL" style="vertical-align: unset;" class="img-fluid"/>
+
+@code {
+    SignaturePad signaturePad;
+    SignaturePad.SupportedImageTypes signatureType;
+    string dataURL;
+
+    private async Task OnSignatureChange(ChangeEventArgs eventArgs)
+    {
+        if (eventArgs?.Value != null)
+        {
+            signatureType = Enum.Parse<SignaturePad.SupportedImageTypes>(eventArgs.Value as string);
+        }
+
+        dataURL = await signaturePad.ToDataURL(signatureType);
+    }
+}
