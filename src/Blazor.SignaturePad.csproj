@@ -10,7 +10,7 @@
     <Company>Mobsites</Company>
     <Authors>Allan Mobley</Authors>
     <Copyright>© 2020 Mobsites</Copyright>
-    <Description>Blazor component library that utilizes the Signature Pad js library to implement smooth signature drawing on a HTML5 canvas.</Description>
+    <Description>A Blazor component library that utilizes Szymon Nowak's javascript library Signature Pad to implement smooth signature drawing on a HTML5 canvas.</Description>
     <PackageId>Mobsites.Blazor.SignaturePad</PackageId>
     <IsPackable>true</IsPackable>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
