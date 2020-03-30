@@ -15,8 +15,8 @@
     <IsPackable>true</IsPackable>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>mobsites-logo.png</PackageIcon>
-    <PackageReleaseNotes>First preview release.</PackageReleaseNotes>
-    <PackageVersion>1.0.0-preview1</PackageVersion>
+    <PackageReleaseNotes>Addressed ios issues for pen color and downloads.</PackageReleaseNotes>
+    <PackageVersion>1.0.0-preview2</PackageVersion>
     <PackageTags>blazor;signature;pad;canvas;component</PackageTags>
     <PackageProjectUrl>https://github.com/Mobsites/Blazor.SignaturePad</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>

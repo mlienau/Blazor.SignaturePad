@@ -5,7 +5,8 @@ A Blazor component library that utilizes [Szymon Nowak](https://github.com/szime
 
 ***Don't worry! You don't have to touch any javascript to make use of this library. Blazor Signature Pad abstracts all of that away for you. Just plug and play, baby.***
 
-#### [Go to live Demo](https://mobsites.github.io/Blazor.SignaturePad/)
+## Demo
+[Demo](https://mobsites.github.io/Blazor.SignaturePad/) works in modern desktop and mobile browsers. Check out the [source code](https://github.com/Mobsites/Blazor.SignaturePad/tree/master/samples/Blazorwasm) in the samples folder.
 
 ![Gif of Demo](src/assets/demo.gif)
 
@@ -30,7 +31,7 @@ Now, not every aspect of that awesome javascript library has been ported over, a
 1. Install [Nuget](https://www.nuget.org/packages/Mobsites.Blazor.SignaturePad/):
 
 ```shell
-dotnet add package Mobsites.Blazor.SignaturePad --version 1.0.0-preview1
+dotnet add package Mobsites.Blazor.SignaturePad --version 1.0.0-preview2
 ```
 
 2. Add the following link tag to `index.html` (WebAssembly) or `_Host.cshtml` (Server) just above the closing `</head>` tag, along with your other link tags:
@@ -160,10 +161,16 @@ Below highlights the built-in C# attributes and their defaults (if any). Use int
 These attributes allows for flexible customization. But if you want to bring your own, well you can do that as well:
 
 ```html
-<!-- Use a button or whatever for the event trigger -->
-<button id="signature-pad--pen"></button>
-<!-- The below markup is required -->
-<input type="color" class="signature-pad--pen-color" id="signature-pad--pen-color" />
+<!-- Below is the approach I have taken.
+     The color input is basically hidden,
+     while the label allows for the color picker to be still opened -->
+<label>
+    <img id="signature-pad--pen" />
+    <!-- The below markup is required -->
+    <input type="color" class="signature-pad--pen-color" id="signature-pad--pen-color" />
+</label>
+<!-- You, of course, can just use color input. Do not use the class if you want it to be visible.
+     The id is needed to tie the change event to it -->
 ```
 
 **There can only be one event trigger for this action; i.e., the first one found by the library will have the event trigger attached to it.*
@@ -232,3 +239,9 @@ These attributes allows for flexible customization. But if you want to bring you
 ```
 
 **There can only be one event trigger for this action; i.e., the first one found by the library will have the event trigger attached to it.*
+
+
+## CSS Conflicts
+You may find that your current styles conflict with this library. For instance, the default Blazor template app bar z-index was lower than the effects applied to the Signature Pad, so I gave the template app bar a higher z-index so that it would remain on top of the Signature Pad when scrolling.
+
+You can see all of this library's css [here](https://github.com/Mobsites/Blazor.SignaturePad/blob/master/src/app.scss).

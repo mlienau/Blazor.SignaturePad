@@ -36,7 +36,7 @@ const OnEndCallBack = () => {
 
 const initEvents = () => {
   initResizeEvent();
-  initPenClickEvent();
+  initPenColorChangeEvent();
   initClearClickEvent();
   initUndoClickEvent();
   initSaveClickEvent();
@@ -72,13 +72,9 @@ const initResizeEvent = () => {
   window.onresize = resizeCanvas;
 }
 
-const initPenClickEvent = () => {
-  var pen = document.getElementById('signature-pad--pen');
-  if (pen) {
-    var penColor = document.getElementById('signature-pad--pen-color');
-    // pen.addEventListener('click', function (event) {
-    //   penColor.click(); 
-    // });
+const initPenColorChangeEvent = () => {
+  var penColor = document.getElementById('signature-pad--pen-color');
+  if (penColor) {
     penColor.addEventListener('change', function (event) {
       window.Blazor.SignaturePad.self.penColor = penColor.value;
     });
