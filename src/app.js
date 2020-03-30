@@ -76,9 +76,9 @@ const initPenClickEvent = () => {
   var pen = document.getElementById('signature-pad--pen');
   if (pen) {
     var penColor = document.getElementById('signature-pad--pen-color');
-    pen.addEventListener('click', function (event) {
-      penColor.click(); 
-    });
+    // pen.addEventListener('click', function (event) {
+    //   penColor.click(); 
+    // });
     penColor.addEventListener('change', function (event) {
       window.Blazor.SignaturePad.self.penColor = penColor.value;
     });
@@ -140,44 +140,6 @@ const initSaveClickEvent = () => {
     });
   }
 }
-
-// const initSavePNGClickEvent = () => {
-//   var pngButton = document.getElementById('signature-pad--save-png');
-//   if (pngButton) {
-//     pngButton.addEventListener('click', function (event) {
-//       var dataURL = toDataURL();
-//       if (dataURL) {
-//         download(dataURL, 'signature.png');
-//       }
-//     });
-//   }
-// }
-
-// const initSaveJPGClickEvent = () => {
-//   var jpegButton = document.getElementById('signature-pad--save-jpg');
-//   if (jpegButton) {
-//     jpegButton.addEventListener('click', function (event) {
-//       // window.Blazor.SignaturePad.self.backgroundColor = 'rgb(255, 255, 255)';
-//       var dataURL = toDataURL_JPEG();  // JPEG's are a special case.
-//       if (dataURL) {
-//         download(dataURL, 'signature.jpg');
-//       }
-//       // window.Blazor.SignaturePad.self.backgroundColor = 'rgba(0,0,0,0)';
-//     });
-//   }
-// }
-
-// const initSaveSVGClickEvent = () => {
-//   var svgButton = document.getElementById('signature-pad--save-svg');
-//   if (svgButton) {
-//     svgButton.addEventListener('click', function (event) {
-//       var dataURL = toDataURL('image/svg+xml');
-//       if (dataURL) {
-//         download(dataURL, 'signature.svg');
-//       }
-//     });
-//   }
-// }
 
 
 // Adjust canvas coordinate space taking into account pixel ratio, to make it look crisp on mobile devices.
