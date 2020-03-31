@@ -19,11 +19,15 @@ steps:
     version: 3.1.200
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
-# Build a sample. Not strictly required to create the package,
-# but we want the pipeline to halt if this step fails.
+# Build samples. Not strictly required to create the package,
+# but we want the pipeline to halt if these steps fail.
 - script: dotnet build --configuration Release
   workingDirectory: samples/Blazorwasm
-  displayName: Build
+  displayName: Build Wasm Sample
+
+- script: dotnet build --configuration Release
+  workingDirectory: samples/Blazorserver
+  displayName: Build Server Sample
 
 # Create the NuGet package file
 - script: dotnet pack --configuration Release
