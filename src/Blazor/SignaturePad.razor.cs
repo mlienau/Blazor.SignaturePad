@@ -24,36 +24,41 @@ namespace Mobsites.Blazor
         /// </summary>
         internal SignaturePadFooter SignaturePadFooter { get; set; }
 
-         private int backgroundImageWidth = 192;
+        /// <summary>
+        /// URL or URL fragment for image source to displayed as a backdrop inside drawing area.
+        /// </summary>
+        [Parameter] public string Image { get; set; }
+
+        private int imageWidth = 192;
         
         /// <summary>
-        /// Background image width (px) override. Defaults to 192px.
+        /// Image width in pixels. Defaults to 192px.
         /// </summary>
-        [Parameter] public int BackgroundImageWidth 
+        [Parameter] public int ImageWidth 
         { 
-            get => backgroundImageWidth; 
+            get => imageWidth; 
             set 
             { 
                 if (value > 0)
                 {
-                    backgroundImageWidth = value;
+                    imageWidth = value;
                 } 
             } 
         }
 
-        private int backgroundImageHeight = 192;
+        private int imageHeight = 192;
         
         /// <summary>
-        /// Background image height (px) override. Defaults to 192px.
+        /// Image height in pixels. Defaults to 192px.
         /// </summary>
-        [Parameter] public int BackgroundImageHeight 
+        [Parameter] public int ImageHeight 
         { 
-            get => backgroundImageHeight; 
+            get => imageHeight; 
             set 
             { 
                 if (value > 0)
                 {
-                    backgroundImageHeight = value;
+                    imageHeight = value;
                 } 
             } 
         }
@@ -71,7 +76,8 @@ namespace Mobsites.Blazor
                 _objRef = DotNetObjectReference.Create(this);
 
                 await jsRuntime.InvokeVoidAsync(
-                    "Blazor.SignaturePad.init",
+                    "Mobsites.Blazor.SignaturePad.init",
+                    null,
                     _objRef);
             }
         }
@@ -81,7 +87,7 @@ namespace Mobsites.Blazor
         /// </summary>
         public async ValueTask<string> ToDataURL(SupportedSaveAsTypes type) => 
             await jsRuntime.InvokeAsync<string>(
-                "Blazor.SignaturePad.toDataURL",
+                "Mobsites.Blazor.SignaturePad.toDataURL",
                 type.ToString());
 
         /// <summary>

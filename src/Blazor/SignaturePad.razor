@@ -1,10 +1,16 @@
 @inherits StatefulComponent
 
-<div id="signature-pad" class="signature-pad @Class" style="@Style" @attributes="@ExtraAttributes">
+@{
+    string backgroundColor = BackgroundMode == BackgroundModes.Image 
+        ? $"background-color: {BackgroundColor ?? "white"};" 
+        : null;
+}
+
+<div id="signature-pad" class="signature-pad @Class" style="@Style @backgroundColor" @attributes="@ExtraAttributes">
     <div class="signature-pad--body">
         @{
-            string background = !string.IsNullOrWhiteSpace(BackgroundImage)
-                ? $"background: url({BackgroundImage}) center / {BackgroundImageWidth}px {BackgroundImageHeight}px no-repeat;"
+            string background = !string.IsNullOrWhiteSpace(Image) && BackgroundMode != BackgroundModes.Image
+                ? $"background: url({Image}) center / {ImageWidth}px {ImageHeight}px no-repeat;"
                 : null;
         }
         <canvas id="signature-pad--canvas" style="@background"></canvas>

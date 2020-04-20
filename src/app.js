@@ -3,181 +3,162 @@
 
 import SignaturePad from 'signature_pad';
 
-window.Blazor.SignaturePad = {
-  init: function (instance) {
-    window.Blazor.SignaturePad.instance = instance;
-    window.Blazor.SignaturePad.self = new SignaturePad(document.getElementById('signature-pad--canvas'));
-    window.Blazor.SignaturePad.self.onEnd = OnEndCallBack;
-    initEvents();
-    resizeCanvas();
+if (!window.Mobsites) {
+  window.Mobsites = {
+    Blazor: {
+
+    }
+  };
+}
+
+window.Mobsites.Blazor.SignaturePad = {
+  init: function (options, instance) {
+    window.Mobsites.Blazor.SignaturePad.options = options;
+    window.Mobsites.Blazor.SignaturePad.instance = instance;
+    window.Mobsites.Blazor.SignaturePad.self = new SignaturePad(document.getElementById('signature-pad--canvas'));
+    window.Mobsites.Blazor.SignaturePad.self.onEnd = this.onEndCallBack;
+    this.initEvents();
+    this.resizeCanvas();
+  },
+  refresh: function (options) {
+    return this.init(options);
+  },
+  initEvents: function () {
+    window.onresize = this.resizeCanvas;
+
+    var penColor = document.getElementById('signature-pad--pen-color');
+    if (penColor) {
+      penColor.addEventListener('change', this.penColorChangeEvent);
+    }
+
+    var clearButton = document.getElementById('signature-pad--clear');
+    if (clearButton) {
+      clearButton.addEventListener('click', this.clearClickEvent);
+    }
+
+    var undoButton = document.getElementById('signature-pad--undo');
+    if (undoButton) {
+      undoButton.addEventListener('click', this.undoClickEvent);
+    }
+
+    var saveButton = document.querySelector('.signature-pad--save');
+    if (saveButton) {
+      saveButton.addEventListener('click', this.saveClickEvent);
+    }
   },
   toDataURL: function (type) {
     var dataURL = null;
-    switch (type) {
-      case 'png':
-        dataURL = toDataURL('image/png');
-        break;
-      case 'svg':
-        dataURL = toDataURL('image/svg+xml');
-        break;
-      case 'jpg':
-        dataURL = toDataURL_JPEG();
-        break;
-      default:
-        break;
-    }
-    return dataURL;
-  }
-}
-
-const OnEndCallBack = () => {
-  window.Blazor.SignaturePad.instance.invokeMethodAsync('OnEnd');
-}
-
-const initEvents = () => {
-  initResizeEvent();
-  initPenColorChangeEvent();
-  initClearClickEvent();
-  initUndoClickEvent();
-  initSaveClickEvent();
-}
-
-const toDataURL = (type) => window.Blazor.SignaturePad.self.isEmpty()
-  ? null
-  : window.Blazor.SignaturePad.self.toDataURL(type)
-
-// JPEG's are a special case.
-const toDataURL_JPEG = () => {
-  if (window.Blazor.SignaturePad.self.isEmpty()) {
-    return null;
-  } else {
-    // Save current signature.
-    var data = window.Blazor.SignaturePad.self.toData();
-    // It's necessary to use an opaque background color when saving image as JPEG.
-    window.Blazor.SignaturePad.self.backgroundColor = 'rgb(255, 255, 255)';
-    // Write signature back against opaque background.
-    window.Blazor.SignaturePad.self.fromData(data);
-    // Save data url.
-    var dataURL = toDataURL('image/jpeg');
-    // Reset background to default.
-    window.Blazor.SignaturePad.self.backgroundColor = 'rgba(0,0,0,0)';
-    // Write signature back against default background.
-    window.Blazor.SignaturePad.self.fromData(data);
-    // Return signature against opaque background.
-    return dataURL;
-  }
-}
-
-const initResizeEvent = () => {
-  window.onresize = resizeCanvas;
-}
-
-const initPenColorChangeEvent = () => {
-  var penColor = document.getElementById('signature-pad--pen-color');
-  if (penColor) {
-    penColor.addEventListener('change', function (event) {
-      window.Blazor.SignaturePad.self.penColor = penColor.value;
-    });
-  }
-}
-
-const initClearClickEvent = () => {
-  var clearButton = document.getElementById('signature-pad--clear');
-  if (clearButton) {
-    clearButton.addEventListener('click', function (event) {
-      window.Blazor.SignaturePad.self.clear();
-      OnEndCallBack();
-    });
-  }
-}
-
-const initUndoClickEvent = () => {
-  var undoButton = document.getElementById('signature-pad--undo');
-  if (undoButton) {
-    undoButton.addEventListener('click', function (event) {
-      var data = window.Blazor.SignaturePad.self.toData();
-
-      if (data) {
-        data.pop(); // remove the last dot or line
-        window.Blazor.SignaturePad.self.fromData(data);
-        OnEndCallBack();
-      }
-    });
-  }
-}
-
-const initSaveClickEvent = () => {
-  var element = document.querySelector('.signature-pad--save');
-  if (element) {
-    element.addEventListener('click', function (event) {
-      switch (this.id) {
-        case 'signature-pad--save-png':
-          var dataURL = toDataURL();
-          if (dataURL) {
-            download(dataURL, 'signature.png');
-          }
+    if (!window.Mobsites.Blazor.SignaturePad.self.isEmpty()) {
+      switch (type) {
+        case 'png':
+          dataURL = window.Mobsites.Blazor.SignaturePad.self.toDataURL('image/png');
           break;
-        case 'signature-pad--save-jpg':
-          var dataURL = toDataURL_JPEG();  // JPEG's are a special case.
-          if (dataURL) {
-            download(dataURL, 'signature.jpg');
-          }
+        case 'svg':
+          dataURL = window.Mobsites.Blazor.SignaturePad.self.toDataURL('image/svg+xml');
           break;
-        case 'signature-pad--save-svg':
-          var dataURL = toDataURL('image/svg+xml');
-          if (dataURL) {
-            download(dataURL, 'signature.svg');
-          }
+        case 'jpg':
+          // JPEG's are a special case.
+          dataURL = window.Mobsites.Blazor.SignaturePad.toDataURL_JPEG();
           break;
         default:
           break;
       }
-      
-    });
-  }
-}
+    }
+    return dataURL;
+  },
+  toDataURL_JPEG: function () {
+    // Save current signature.
+    var data = window.Mobsites.Blazor.SignaturePad.self.toData();
+    // It's necessary to use an opaque background color when saving image as JPEG.
+    window.Mobsites.Blazor.SignaturePad.self.backgroundColor = 'rgb(255, 255, 255)';
+    // Write signature back against opaque background.
+    window.Mobsites.Blazor.SignaturePad.self.fromData(data);
+    // Save data url.
+    var dataURL = window.Mobsites.Blazor.SignaturePad.self.toDataURL('image/jpeg');
+    // Reset background to default.
+    window.Mobsites.Blazor.SignaturePad.self.backgroundColor = 'rgba(0,0,0,0)';
+    // Write signature back against default background.
+    window.Mobsites.Blazor.SignaturePad.self.fromData(data);
+    // Return signature against opaque background.
+    return dataURL;
+  },
+  onEndCallBack: function () {
+    window.Mobsites.Blazor.SignaturePad.instance.invokeMethodAsync('OnEnd');
+  },
+  resizeCanvas: function () {
+    var canvas = document.getElementById('signature-pad--canvas');
+    if (canvas) {
+      // Store signature in memory before resizing so as not to lose it.
+      var data = window.Mobsites.Blazor.SignaturePad.self.toData();
 
+      // When zoomed out to less than 100%, for some very strange reason,
+      // some browsers report devicePixelRatio as less than 1
+      // and only part of the canvas is cleared then.
+      var ratio = Math.max(window.devicePixelRatio || 1, 1);
 
-// Adjust canvas coordinate space taking into account pixel ratio, to make it look crisp on mobile devices.
-// This also causes canvas to be cleared.
-function resizeCanvas() {
+      // This part causes the canvas to be cleared
+      canvas.width = canvas.offsetWidth * ratio;
+      canvas.height = canvas.offsetHeight * ratio;
+      canvas.getContext('2d').scale(ratio, ratio);
 
-  var canvas = document.getElementById('signature-pad--canvas');
+      // This library does not listen for canvas changes, so after the canvas is automatically
+      // cleared by the browser, SignaturePad#isEmpty might still return false, even though the
+      // canvas looks empty, because the internal data of this library wasn't cleared. To make sure
+      // that the state of this library is consistent with visual state of the canvas, you
+      // have to clear it manually.
+      window.Mobsites.Blazor.SignaturePad.self.clear();
 
-  if (canvas) {
-    // Store signature in memory before resizing so as not to lose it.
-    var data = window.Blazor.SignaturePad.self.toData();
-
-    // When zoomed out to less than 100%, for some very strange reason,
-    // some browsers report devicePixelRatio as less than 1
-    // and only part of the canvas is cleared then.
-    var ratio = Math.max(window.devicePixelRatio || 1, 1);
-
-    
-
-    // This part causes the canvas to be cleared
-    canvas.width = canvas.offsetWidth * ratio;
-    canvas.height = canvas.offsetHeight * ratio;
-    canvas.getContext('2d').scale(ratio, ratio);
-
-    // This library does not listen for canvas changes, so after the canvas is automatically
-    // cleared by the browser, SignaturePad#isEmpty might still return false, even though the
-    // canvas looks empty, because the internal data of this library wasn't cleared. To make sure
-    // that the state of this library is consistent with visual state of the canvas, you
-    // have to clear it manually.
-    window.Blazor.SignaturePad.self.clear();
-
-    // Write signature back.
-    window.Blazor.SignaturePad.self.fromData(data);
-  }
-}
-
-function download(dataURL, filename) {
-  var a = document.createElement('a');
-  a.style = 'display: none';
-  a.href = dataURL;
-  a.download = filename;
-  a.target = '_blank'
-  document.body.appendChild(a);
-  a.click();
+      // Write signature back.
+      window.Mobsites.Blazor.SignaturePad.self.fromData(data);
+    }
+  },
+  penColorChangeEvent: function () {
+    window.Mobsites.Blazor.SignaturePad.self.penColor = document.getElementById('signature-pad--pen-color').value;
+  },
+  clearClickEvent: function () {
+    window.Mobsites.Blazor.SignaturePad.self.clear();
+    window.Mobsites.Blazor.SignaturePad.onEndCallBack();
+  },
+  undoClickEvent: function () {
+    var data = window.Mobsites.Blazor.SignaturePad.self.toData();
+    if (data) {
+      data.pop(); // remove the last dot or line
+      window.Mobsites.Blazor.SignaturePad.self.fromData(data);
+      window.Mobsites.Blazor.SignaturePad.onEndCallBack();
+    }
+  },
+  saveClickEvent: function () {
+    switch (this.id) {
+      case 'signature-pad--save-png':
+        var dataURL = window.Mobsites.Blazor.SignaturePad.self.toDataURL();
+        if (dataURL) {
+          window.Mobsites.Blazor.SignaturePad.download(dataURL, 'signature.png');
+        }
+        break;
+      case 'signature-pad--save-jpg':
+        // JPEG's are a special case.
+        var dataURL = window.Mobsites.Blazor.SignaturePad.toDataURL_JPEG();
+        if (dataURL) {
+          window.Mobsites.Blazor.SignaturePad.download(dataURL, 'signature.jpg');
+        }
+        break;
+      case 'signature-pad--save-svg':
+        var dataURL = window.Mobsites.Blazor.SignaturePad.self.toDataURL('image/svg+xml');
+        if (dataURL) {
+          window.Mobsites.Blazor.SignaturePad.download(dataURL, 'signature.svg');
+        }
+        break;
+      default:
+        break;
+    }
+  },
+  download: function (dataURL, filename) {
+    var a = document.createElement('a');
+    a.style = 'display: none';
+    a.href = dataURL;
+    a.download = filename;
+    a.target = '_blank'
+    document.body.appendChild(a);
+    a.click();
+  },
 }

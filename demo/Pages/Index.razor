@@ -13,7 +13,13 @@
         </p>
     </div>
 </div>
-<SignaturePad BackgroundMode="BackgroundModes.Dark" BackgroundImage="blazor.png" @ref="signaturePad" OnChangeCallback="OnSignatureChange">
+<SignaturePad BackgroundMode="BackgroundModes.Gradient"
+              BackgroundColor="grey"
+              BackgroundColorStart="rgb(5, 39, 103)" 
+              BackgroundColorEnd="#3a0647"
+              Image="blazor.png" 
+              @ref="signaturePad" 
+              OnChangeCallback="OnSignatureChange">
     <SignaturePadFooter>
         <SignaturePadPen Image="pen.png" />
         <SignaturePadClear Image="clear.png" />
