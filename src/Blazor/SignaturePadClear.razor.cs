@@ -2,46 +2,28 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
 using Microsoft.AspNetCore.Components;
-using System.Collections.Generic;
 
 namespace Mobsites.Blazor
 {
     /// <summary>
-    /// Blazor child component for clearing the <see cref="SignaturePad"/>.
+    /// Child component for clearing the <see cref="SignaturePad"/> component.
     /// </summary>
     public partial class SignaturePadClear
     {
         /// <summary>
-        /// All html attributes outside of the class attribute go here. Use the Class attribute property to add css classes.
+        /// Content to render.
         /// </summary>
-        [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> ExtraAttributes { get; set; }
-
-        /// <summary>
-        /// Css classes for affecting this component go here.
-        /// </summary>
-        [Parameter] public string Class { get; set; }
-
-        private string imageSource = "_content/Mobsites.Blazor.SignaturePad/clear.png";
+        [Parameter] public RenderFragment ChildContent { get; set; }
         
         /// <summary>
-        /// Image source override. Defaults to '_content/Mobsites.Blazor.SignaturePad/clear.png'.
+        /// URL or URL fragment for image source.
         /// </summary>
-        [Parameter] public string ImageSource 
-        { 
-            get => imageSource; 
-            set 
-            { 
-                if (!string.IsNullOrEmpty(value))
-                {
-                    imageSource = value;
-                } 
-            } 
-        }
+        [Parameter] public string Image { get; set; }
 
         private int imageWidth = 36;
         
         /// <summary>
-        /// Image width (px) override. Defaults to 36px.
+        /// Image width in pixels. Defaults to 36px.
         /// </summary>
         [Parameter] public int ImageWidth 
         { 
@@ -58,7 +40,7 @@ namespace Mobsites.Blazor
         private int imageHeight = 36;
         
         /// <summary>
-        /// Image height (px) override. Defaults to 36px.
+        /// Image height in pixels. Defaults to 36px.
         /// </summary>
         [Parameter] public int ImageHeight 
         { 

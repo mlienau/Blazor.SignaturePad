@@ -1,0 +1,67 @@
+@page "/"
+
+<h1>Blazor Signature Pad</h1>
+<h2 class="pl-5">by <img src="mobsites-logo.png" width="42" height="42" />obsites</h2>
+<br />
+<div class="row mb-3">
+    <div class="col col-sm-8 col-xl-4">
+        <p>
+            <b>
+                NOTE: This demo component is set to keep state. Make some changes,
+                reload the page, and see how the changes are maintained.
+            </b>
+        </p>
+    </div>
+</div>
+<SignaturePad BackgroundMode="BackgroundModes.Dark" BackgroundImage="blazor.png" @ref="signaturePad" OnChangeCallback="OnSignatureChange">
+    <SignaturePadFooter>
+        <SignaturePadPen Image="pen.png" />
+        <SignaturePadClear Image="clear.png" />
+        <SignaturePadUndo Image="undo.png" />
+        <SignaturePadSave Image="save.png" SaveAsType="signatureType" />
+    </SignaturePadFooter>
+</SignaturePad>
+<br />
+<h6>Below image and data url are captured using SignaturePad onchange callback event:</h6>
+<select @onchange="OnSignatureChange">
+    <option value="@SignaturePad.SupportedSaveAsTypes.png">PNG</option>
+    <option value="@SignaturePad.SupportedSaveAsTypes.jpg">JPEG</option>
+    <option value="@SignaturePad.SupportedSaveAsTypes.svg">SVG</option>
+</select>
+<br />
+<br />
+<textarea rows="10" class="w-50">@dataURL</textarea><img src="@dataURL" style="vertical-align: unset;" class="img-fluid"/>
+<br />
+<div class="row mb-3">
+    <div class="col col-sm-8 col-xl-4">
+        <p>
+            <b>
+                * <small><i>This demonstrates the use of this component 
+                without a dependency on any of our other components. 
+                We, of course, recommend using this component in conjunction with our other components 
+                as they work seamlessly together and can benefit one another, 
+                not to mention there are often less css adjustments to incorporate.
+                But if you want to go solo, check out the source code for this demo</i> 
+                <a target="_blank" href="https://github.com/Mobsites/Blazor.SignaturePad/tree/master/demo">here</a>
+                for one approach.</small>
+            </b>
+        </p>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter] MainLayout MainLayout { get; set; }
+    SignaturePad signaturePad;
+    SignaturePad.SupportedSaveAsTypes signatureType;
+    string dataURL;
+
+    private async Task OnSignatureChange(ChangeEventArgs eventArgs)
+    {
+        if (eventArgs?.Value != null)
+        {
+            signatureType = Enum.Parse<SignaturePad.SupportedSaveAsTypes>(eventArgs.Value as string);
+        }
+
+        dataURL = await signaturePad.ToDataURL(signatureType);
+    }
+}

@@ -3,78 +3,26 @@
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Mobsites.Blazor
 {
     /// <summary>
-    /// Blazor component library that utilizes Szymon Nowak's javascript library Signature Pad to implement smooth signature drawing on a HTML5 canvas.
+    /// Component that utilizes the Signature Pad javascript library to implement smooth signature drawing on a HTML5 canvas.
     /// </summary>
-    public partial class SignaturePad : IDisposable
+    public partial class SignaturePad
     {
         private DotNetObjectReference<SignaturePad> _objRef;
-        [Inject] protected IJSRuntime jsRuntime { get; set; }
 
         /// <summary>
-        /// All html attributes outside of the class attribute go here. Use the Class attribute property to add css classes.
-        /// </summary>
-        [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> ExtraAttributes { get; set; }
-
-        /// <summary>
-        /// The signature pad actions or custom footer content (optional).
+        /// Content to render.
         /// </summary>
         [Parameter] public RenderFragment ChildContent { get; set; }
 
         /// <summary>
-        /// Css classes for affecting this component go here.
+        /// Child reference. (Assigned by child.)
         /// </summary>
-        [Parameter] public string Class { get; set; }
-
-        /// <summary>
-        /// Whether to hide the footer directive below the canvas.
-        /// </summary>
-        [Parameter] public bool HideFooterDirective { get; set; }
-
-        private string footerDirective = "Sign above";
-        
-        /// <summary>
-        /// Footer directive override. Defaults to 'Sign above'.
-        /// </summary>
-        [Parameter] public string FooterDirective 
-        { 
-            get => footerDirective; 
-            set 
-            { 
-                if (!string.IsNullOrEmpty(value))
-                {
-                    footerDirective = value;
-                } 
-            } 
-        }
-
-        /// <summary>
-        /// Whether to show a background image on the canvas.
-        /// </summary>
-        [Parameter] public bool UseBackgroundImage { get; set; }
-
-        private string backgroundImage = "_content/Mobsites.Blazor.SignaturePad/blazor.png";
-        
-        /// <summary>
-        /// Background image override. Defaults to '_content/Mobsites.Blazor.SignaturePad/blazor.png'.
-        /// </summary>
-        [Parameter] public string BackgroundImage 
-        { 
-            get => backgroundImage; 
-            set 
-            { 
-                if (!string.IsNullOrEmpty(value))
-                {
-                    backgroundImage = value;
-                } 
-            } 
-        }
+        internal SignaturePadFooter SignaturePadFooter { get; set; }
 
          private int backgroundImageWidth = 192;
         
@@ -111,16 +59,6 @@ namespace Mobsites.Blazor
         }
 
         /// <summary>
-        /// The supported image types.
-        /// </summary>
-        public enum SupportedImageTypes
-        {
-            png,
-            jpg,
-            svg
-        }
-
-        /// <summary>
         /// Callback that is fired when a signature stroke finishes or is removed, or when the signature is cleared.
         /// </summary>
         [Parameter]
@@ -141,7 +79,7 @@ namespace Mobsites.Blazor
         /// <summary>
         /// Get signature as data url according to the supported type.
         /// </summary>
-        public async ValueTask<string> ToDataURL(SupportedImageTypes type) => 
+        public async ValueTask<string> ToDataURL(SupportedSaveAsTypes type) => 
             await jsRuntime.InvokeAsync<string>(
                 "Blazor.SignaturePad.toDataURL",
                 type.ToString());
@@ -155,7 +93,7 @@ namespace Mobsites.Blazor
             await OnChangeCallback.InvokeAsync(null);
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             _objRef?.Dispose();
         }
