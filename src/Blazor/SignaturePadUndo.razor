@@ -8,14 +8,16 @@
          height="@ImageHeight" 
          class="signature-pad--undo @Class" 
          style="@Style"
-         @attributes="@ExtraAttributes" />
+         @attributes="@ExtraAttributes"
+         @onclick="Undo" />
 }
 else if (ChildContent != null)
 {
     <div id="signature-pad--undo" 
-         class="signature-pad--undo @Class" 
+         class="signature-pad--undo signature-pad--action-item @Class" 
          style="@Style"
-         @attributes="@ExtraAttributes">
+         @attributes="@ExtraAttributes"
+         @onclick="Undo">
         @ChildContent
     </div>
 }

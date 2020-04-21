@@ -13,14 +13,15 @@
         </p>
     </div>
 </div>
-<SignaturePad BackgroundMode="BackgroundModes.Gradient"
-              BackgroundColor="grey"
+<SignaturePad KeepState
+              Id="Demo"
+              BackgroundMode="BackgroundModes.Gradient"
               BackgroundColorStart="rgb(5, 39, 103)" 
               BackgroundColorEnd="#3a0647"
               Image="blazor.png" 
               @ref="signaturePad" 
-              OnChangeCallback="OnSignatureChange">
-    <SignaturePadFooter>
+              OnSignatureChange="OnSignatureChange">
+    <SignaturePadFooter FooterDirective="Sign above">
         <SignaturePadPen Image="pen.png" />
         <SignaturePadClear Image="clear.png" />
         <SignaturePadUndo Image="undo.png" />
@@ -28,13 +29,17 @@
     </SignaturePadFooter>
 </SignaturePad>
 <br />
-<h6>Below image and data url are captured using SignaturePad onchange callback event:</h6>
+<h6>Below image and data url are captured using SignaturePad onchange callback event: @color</h6>
 <select @onchange="OnSignatureChange">
     <option value="@SignaturePad.SupportedSaveAsTypes.png">PNG</option>
     <option value="@SignaturePad.SupportedSaveAsTypes.jpg">JPEG</option>
     <option value="@SignaturePad.SupportedSaveAsTypes.svg">SVG</option>
 </select>
 <br />
+<label>
+    Change Color
+    <input type="color" @onchange="@((e) => color = e.Value as string)" />
+</label>
 <br />
 <textarea rows="10" class="w-50">@dataURL</textarea><img src="@dataURL" style="vertical-align: unset;" class="img-fluid"/>
 <br />
@@ -60,6 +65,7 @@
     SignaturePad signaturePad;
     SignaturePad.SupportedSaveAsTypes signatureType;
     string dataURL;
+    string color;
 
     private async Task OnSignatureChange(ChangeEventArgs eventArgs)
     {

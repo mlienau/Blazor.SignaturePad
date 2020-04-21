@@ -10,18 +10,24 @@
              class="signature-pad--pen @Class" 
              style="@Style"
              @attributes="@ExtraAttributes" />
-        <input type="color" class="signature-pad--pen-color" id="signature-pad--pen-color" />
+        <input type="color" 
+               class="signature-pad--pen-color" 
+               id="signature-pad--pen-color"
+               @onchange="@((e) => ChangeColor(e.Value as string))" />
     </label>
 }
 else if (ChildContent != null)
 {
-    <label>
+    <label class="signature-pad--action-item">
         <div id="signature-pad--pen" 
              class="signature-pad--pen @Class" 
              style="@Style"
              @attributes="@ExtraAttributes">
             @ChildContent
+        <input type="color" 
+               class="signature-pad--pen-color" 
+               id="signature-pad--pen-color"
+               @onchange="@((e) => ChangeColor(e.Value as string))" />
         </div>
-        <input type="color" class="signature-pad--pen-color" id="signature-pad--pen-color" />
     </label>
 }

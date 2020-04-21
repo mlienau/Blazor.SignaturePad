@@ -21,7 +21,7 @@
     background-color: #fff;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.08) inset;
     border-radius: 4px;
-    padding: 16px;
+    padding: 16px 16px 8px 16px;
 }
 
 .signature-pad::before,
@@ -72,6 +72,12 @@
 .signature-pad--actions {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+}
+
+.signature-pad--action-item {
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .signature-pad--pen,

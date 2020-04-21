@@ -8,14 +8,16 @@
          height="@ImageHeight" 
          class="signature-pad--clear @Class" 
          style="@Style"
-         @attributes="@ExtraAttributes" />
+         @attributes="@ExtraAttributes"
+         @onclick="Clear" />
 }
 else if (ChildContent != null)
 {
     <div id="signature-pad--clear" 
-         class="signature-pad--clear @Class" 
+         class="signature-pad--clear signature-pad--action-item @Class" 
          style="@Style"
-         @attributes="@ExtraAttributes">
+         @attributes="@ExtraAttributes"
+         @onclick="Clear">
         @ChildContent
     </div>
 }

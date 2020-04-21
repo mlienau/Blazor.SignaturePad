@@ -2,15 +2,24 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
 using Microsoft.AspNetCore.Components;
-using System.Collections.Generic;
+using Microsoft.JSInterop;
+using System.Threading.Tasks;
 
 namespace Mobsites.Blazor
 {
     /// <summary>
-    /// Blazor child component for saving signature of the <see cref="SignaturePad"/>.
+    /// UI child component of the <see cref="SignaturePadFooter"/> component, 
+    /// housing the functionality for saving to file the signature
+    /// of the <see cref="SignaturePad"/> component.
     /// </summary>
     public partial class SignaturePadSave
     {
+        /****************************************************
+        *
+        *  PUBLIC INTERFACE
+        *
+        ****************************************************/
+
         /// <summary>
         /// Content to render.
         /// </summary>
@@ -21,7 +30,20 @@ namespace Mobsites.Blazor
         /// </summary>
         [Parameter] public SignaturePad.SupportedSaveAsTypes SaveAsType { get; set; }
 
-        
+        /// <summary>
+        /// The foreground color for this component. Accepts any valid css color usage.
+        /// </summary>
+        [Parameter] public override string Color
+        {
+            get => base.Color ?? "black";
+            set => base.Color = value;
+        }
+
+        /// <summary>
+        /// Whether to inherit a parent's background colors (dark, light, or normal modes).
+        /// </summary>
+        [Parameter] public override bool InheritParentBackgroundColors { get; set; } = true;
+
         /// <summary>
         /// URL or URL fragment for image source.
         /// </summary>
@@ -59,6 +81,44 @@ namespace Mobsites.Blazor
                     imageHeight = value;
                 } 
             } 
+        }
+
+        /// <summary>
+        /// Save signature to file as one of the supported image types.
+        /// </summary>
+        public async Task Save(SignaturePad.SupportedSaveAsTypes saveAsType)
+        {
+            await this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.save", saveAsType.ToString());
+        }
+
+        
+
+        /****************************************************
+        *
+        *  NON-PUBLIC INTERFACE
+        *
+        ****************************************************/
+
+        protected override void OnParametersSet()
+        {
+            // This will check for valid parent.
+            base.OnParametersSet();
+            base.Parent.SignaturePadSave = this;
+        }
+
+        internal void SetOptions(SignaturePad.Options options)
+        {
+            options.SignaturePadSave = new Options 
+            {
+                
+            };
+
+            base.SetOptions(options.SignaturePadSave);
+        }
+
+        internal async Task<bool> CheckState(SignaturePad.Options options)
+        {
+            return await base.CheckState(options.SignaturePadSave);
         }
     }
 }
