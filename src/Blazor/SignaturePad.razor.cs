@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Mobsites.Blazor
 {
     /// <summary>
-    /// UI component that utilizes the Signature Pad javascript library to implement smooth signature drawing on a HTML5 canvas.
+    /// UI component for smooth signature drawing on a HTML5 canvas.
     /// </summary>
     public partial class SignaturePad
     {
@@ -69,45 +69,41 @@ namespace Mobsites.Blazor
         public EventCallback<ChangeEventArgs> OnSignatureChange { get; set; }
 
         /// <summary>
+        /// Clear all state for this UI component and any of its dependents from browser storage.
+        /// </summary>
+        public Task ClearState() => this.ClearState<SignaturePad, Options>().AsTask();
+
+        /// <summary>
         /// Get signature as data url according to the supported type.
         /// </summary>
-        public async ValueTask<string> ToDataURL(SupportedSaveAsTypes type) => 
-            await jsRuntime.InvokeAsync<string>(
-                "Mobsites.Blazor.SignaturePad.toDataURL",
-                type.ToString());
+        public Task<string> ToDataURL(SupportedSaveAsTypes type) => this.jsRuntime.InvokeAsync<string>(
+            "Mobsites.Blazor.SignaturePad.toDataURL",
+            type.ToString())
+            .AsTask();
 
         /// <summary>
         /// Invoked from a javascript callback event when a signature changes in some way.
         /// </summary>
         [JSInvokable]
-        public async Task SignatureChanged()
-        {
-            await OnSignatureChange.InvokeAsync(null);
-        }
+        public Task SignatureChanged() => this.OnSignatureChange.InvokeAsync(null);
 
         /// <summary>
         /// Clear signature pad.
         /// </summary>
-        public async Task Clear()
-        {
-            await this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.clear");
-        }
+        public Task Clear() => this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.clear").AsTask();
 
         /// <summary>
         /// Undo last signature stroke.
         /// </summary>
-        public async Task Undo()
-        {
-            await this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.undo");
-        }
+        public Task Undo() => this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.undo").AsTask();
 
         /// <summary>
         /// Save signature to file as one of the supported image types.
         /// </summary>
-        public async Task Save(SignaturePad.SupportedSaveAsTypes saveAsType)
-        {
-            await this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.save", saveAsType.ToString());
-        }
+        public Task Save(SignaturePad.SupportedSaveAsTypes saveAsType) => this.jsRuntime.InvokeVoidAsync(
+            "Mobsites.Blazor.SignaturePad.save", 
+            saveAsType.ToString())
+            .AsTask();
 
 
 
@@ -143,13 +139,7 @@ namespace Mobsites.Blazor
 
         internal async Task Initialize()
         {
-            string key = GetKey(nameof(SignaturePad));
-
-            var options = this.KeepState 
-                ? this.UseSessionStorageForState
-                    ? await this.Storage.Session.GetAsync<Options>(key)
-                    : await this.Storage.Local.GetAsync<Options>(key)
-                : null;
+            var options = await this.GetState<SignaturePad, Options>();
 
             if (options is null)
             {
@@ -167,19 +157,13 @@ namespace Mobsites.Blazor
                 "Mobsites.Blazor.SignaturePad.init",
                 Self,
                 options);
-            
-            await Save(options, key);
+
+            await this.Save<SignaturePad, Options>(options);
         }
 
         internal async Task Refresh()
         {
-            string key = GetKey(nameof(SignaturePad));
-
-            var options = this.KeepState 
-                ? this.UseSessionStorageForState
-                    ? await this.Storage.Session.GetAsync<Options>(key)
-                    : await this.Storage.Local.GetAsync<Options>(key)
-                : null;
+            var options = await this.GetState<SignaturePad, Options>();
             
             // Use current state if...
             if (this.initialized || options is null)
@@ -191,8 +175,8 @@ namespace Mobsites.Blazor
                 "Mobsites.Blazor.SignaturePad.refresh",
                 Self,
                 options);
-            
-            await Save(options, key);
+
+            await this.Save<SignaturePad, Options>(options);
         }
 
         internal Options GetOptions()
@@ -217,29 +201,6 @@ namespace Mobsites.Blazor
                 StateHasChanged();
         }
 
-        internal async Task Save(Options options, string key)
-        {
-            // Clear destory before saving.
-            options.Destroy = false;
-
-            if (this.KeepState)
-            {
-                if (this.UseSessionStorageForState)
-                {
-                    await this.Storage.Session.SetAsync(key, options);
-                }
-                else
-                {
-                    await this.Storage.Local.SetAsync(key, options);
-                }
-            }
-            else
-            {
-                await this.Storage.Session.RemoveAsync<Options>(key);
-                await this.Storage.Local.RemoveAsync<Options>(key);
-            }
-        }
-
         /// <summary>
         /// Internal helper only. 
         /// User can externally change pen color via the Color property.
@@ -248,7 +209,7 @@ namespace Mobsites.Blazor
         {
             Color = color;
             await this.ColorChanged.InvokeAsync(color);
-            await Save(GetOptions(), GetKey(nameof(SignaturePad)));
+            await this.Save<SignaturePad, Options>(GetOptions());
         }
 
         public override void Dispose()

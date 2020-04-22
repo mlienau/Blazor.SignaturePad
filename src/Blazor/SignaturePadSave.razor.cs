@@ -86,10 +86,10 @@ namespace Mobsites.Blazor
         /// <summary>
         /// Save signature to file as one of the supported image types.
         /// </summary>
-        public async Task Save(SignaturePad.SupportedSaveAsTypes saveAsType)
-        {
-            await this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.save", saveAsType.ToString());
-        }
+        public Task Save(SignaturePad.SupportedSaveAsTypes saveAsType) => this.jsRuntime.InvokeVoidAsync(
+            "Mobsites.Blazor.SignaturePad.save", 
+            saveAsType.ToString())
+            .AsTask();
 
         
 

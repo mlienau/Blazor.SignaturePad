@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Components;
 namespace Mobsites.Blazor
 {
     /// <summary>
-    /// UI subcomponent for housing actions relevant to the <see cref="SignaturePad"/> component.
+    /// UI subcomponent for rendering a footer in the <see cref="SignaturePad"/> component.
     /// </summary>
     public partial class SignaturePadFooter
     {
@@ -37,7 +37,7 @@ namespace Mobsites.Blazor
         /// </summary>
         [Parameter] public override string Color
         {
-            get => base.Color ?? "black";
+            get => ContrastMode == ContrastModes.Light ? "black" : base.Color ?? "black";
             set => base.Color = value;
         }
 

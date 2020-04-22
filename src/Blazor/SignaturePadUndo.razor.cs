@@ -81,10 +81,7 @@ namespace Mobsites.Blazor
         /// <summary>
         /// Undo last signature stroke.
         /// </summary>
-        public async Task Undo()
-        {
-            await this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.undo");
-        }
+        public Task Undo() => this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.undo").AsTask();
 
         
 

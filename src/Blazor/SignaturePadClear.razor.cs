@@ -81,10 +81,7 @@ namespace Mobsites.Blazor
         /// <summary>
         /// Clear signature pad.
         /// </summary>
-        public async Task Clear()
-        {
-            await this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.clear");
-        }
+        public Task Clear() => this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.clear").AsTask();
 
         
 

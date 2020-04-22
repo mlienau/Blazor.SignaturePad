@@ -1,4 +1,5 @@
 bin
 obj
 pub
+test
 node_modules
