@@ -26,6 +26,14 @@ namespace Mobsites.Blazor
             ***********************************************************************/
             
             public bool Destroy { get; set; }
+
+            private SupportedSaveAsTypes? saveAsType;
+            public SupportedSaveAsTypes? SaveAsType
+            { 
+                get => saveAsType; 
+                set => saveAsType = this.NullOnZero<SupportedSaveAsTypes?>(value); 
+            }
+
             public SignaturePadFooter.Options SignaturePadFooter { get; set; }
             public SignaturePadPen.Options SignaturePadPen { get; set; }
             public SignaturePadClear.Options SignaturePadClear { get; set; }

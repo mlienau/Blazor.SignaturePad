@@ -64,6 +64,16 @@ namespace Mobsites.Blazor
         }
 
         /// <summary>
+        /// Image type to save as. Defaults to png.
+        /// </summary>
+        [Parameter] public SupportedSaveAsTypes SaveAsType { get; set; }
+
+        /// <summary>
+        /// Call back event for notifying another component that this property changed. 
+        /// </summary>
+        [Parameter] public EventCallback<SupportedSaveAsTypes> SaveAsTypeChanged { get; set; }
+
+        /// <summary>
         /// Callback that is fired when a signature stroke finishes or is removed, or when the signature is cleared.
         /// </summary>
         [Parameter]
@@ -77,20 +87,8 @@ namespace Mobsites.Blazor
         /// <summary>
         /// Get signature as data url according to the supported type.
         /// </summary>
-        public Task<string> ToDataURL(SupportedSaveAsTypes type) => this.jsRuntime.InvokeAsync<string>(
-            "Mobsites.Blazor.SignaturePad.toDataURL",
-            type.ToString())
-            .AsTask();
-        /// <summary>
-        /// Get signature as data url according to the supported type.
-        /// </summary>
-        public async Task<string> ToDataURLServer(SupportedSaveAsTypes type)
+        public async Task<string> ToDataURL(SupportedSaveAsTypes type)
         {
-            //DataUploader uploader = new DataUploader(jsRuntime);
-            ////StreamReader streamReader = new StreamReader(await uploader.ReceiveData(9999999, type.ToString()));
-            //string rtn = await uploader.ReceiveData(9999999, type.ToString());
-            //return rtn;
-
             int _segmentSize = 24576;
 
             var fileSize = await jsRuntime.InvokeAsync<int>("Mobsites.Blazor.SignaturePad.getDataSize", type.ToString());
@@ -112,16 +110,10 @@ namespace Mobsites.Blazor
                 {
                     return null;
                 }
-                rtnData = rtnData + segmentData;
+                rtnData += segmentData;
             }
             return rtnData;
         }
-
-        /// <summary>
-        /// Invoked from a javascript callback event when a signature changes in some way.
-        /// </summary>
-        [JSInvokable]
-        public Task SignatureChanged() => this.OnSignatureChange.InvokeAsync(null);
 
         /// <summary>
         /// Clear signature pad.
@@ -136,10 +128,38 @@ namespace Mobsites.Blazor
         /// <summary>
         /// Save signature to file as one of the supported image types.
         /// </summary>
-        public Task Save(SignaturePad.SupportedSaveAsTypes saveAsType) => this.jsRuntime.InvokeVoidAsync(
+        public Task Save(SupportedSaveAsTypes? saveAsType = null) => this.jsRuntime.InvokeVoidAsync(
             "Mobsites.Blazor.SignaturePad.save", 
-            saveAsType.ToString())
+            (saveAsType ?? SaveAsType).ToString())
             .AsTask();
+
+        /// <summary>
+        /// Invoked from a javascript callback event when a signature changes in some way.
+        /// </summary>
+        [JSInvokable]
+        public Task SignatureChanged()
+        {
+            if (KeepState)
+                this.jsRuntime.InvokeVoidAsync(
+                    "Mobsites.Blazor.SignaturePad.saveSignatureState",
+                    $"Mobsites.Blazor.{this.GetKey<SignaturePad>()}.DataURL",
+                    this.UseSessionStorageForState);
+
+            return this.OnSignatureChange.InvokeAsync(null);
+        }
+
+        /// <summary>
+        /// Invoked from a javascript callback event to signal that the signature needs to be restored.
+        /// </summary>
+        [JSInvokable]
+        public async ValueTask RestoreSignatureState()
+        {
+            if (KeepState)
+                await this.jsRuntime.InvokeVoidAsync(
+                    "Mobsites.Blazor.SignaturePad.restoreSignatureState",
+                    $"Mobsites.Blazor.{this.GetKey<SignaturePad>()}.DataURL",
+                    this.UseSessionStorageForState);
+        }
 
 
 
@@ -230,10 +250,21 @@ namespace Mobsites.Blazor
 
         internal async Task CheckState(Options options)
         {
+            bool stateChanged = false;
+
+            if (this.SaveAsType != (options.SaveAsType ?? SupportedSaveAsTypes.png))
+            {
+                this.SaveAsType = options.SaveAsType ?? SupportedSaveAsTypes.png;
+                await this.SaveAsTypeChanged.InvokeAsync(this.SaveAsType);
+                stateChanged = true;
+            }
+
             bool baseStateChanged = await base.CheckState(options);
             bool footerStateChanged = await this.SignaturePadFooter?.CheckState(options);
 
-            if (baseStateChanged || footerStateChanged)
+            if (stateChanged
+                || baseStateChanged 
+                || footerStateChanged)
                 StateHasChanged();
         }
 
