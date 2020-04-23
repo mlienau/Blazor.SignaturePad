@@ -3,161 +3,286 @@
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
 
 namespace Mobsites.Blazor
 {
     /// <summary>
-    /// Blazor component library that utilizes Szymon Nowak's javascript library Signature Pad to implement smooth signature drawing on a HTML5 canvas.
+    /// UI component for smooth signature drawing on a HTML5 canvas.
     /// </summary>
-    public partial class SignaturePad : IDisposable
+    public partial class SignaturePad
     {
-        private DotNetObjectReference<SignaturePad> _objRef;
-        [Inject] protected IJSRuntime jsRuntime { get; set; }
+        /****************************************************
+        *
+        *  PUBLIC INTERFACE
+        *
+        ****************************************************/
 
         /// <summary>
-        /// All html attributes outside of the class attribute go here. Use the Class attribute property to add css classes.
-        /// </summary>
-        [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> ExtraAttributes { get; set; }
-
-        /// <summary>
-        /// The signature pad actions or custom footer content (optional).
+        /// Content to render.
         /// </summary>
         [Parameter] public RenderFragment ChildContent { get; set; }
 
         /// <summary>
-        /// Css classes for affecting this component go here.
+        /// URL or URL fragment for image source to displayed as a backdrop inside drawing area.
         /// </summary>
-        [Parameter] public string Class { get; set; }
+        [Parameter] public string Image { get; set; }
 
-        /// <summary>
-        /// Whether to hide the footer directive below the canvas.
-        /// </summary>
-        [Parameter] public bool HideFooterDirective { get; set; }
-
-        private string footerDirective = "Sign above";
+        private int imageWidth = 192;
         
         /// <summary>
-        /// Footer directive override. Defaults to 'Sign above'.
+        /// Image width in pixels. Defaults to 192px.
         /// </summary>
-        [Parameter] public string FooterDirective 
+        [Parameter] public int ImageWidth 
         { 
-            get => footerDirective; 
-            set 
-            { 
-                if (!string.IsNullOrEmpty(value))
-                {
-                    footerDirective = value;
-                } 
-            } 
-        }
-
-        /// <summary>
-        /// Whether to show a background image on the canvas.
-        /// </summary>
-        [Parameter] public bool UseBackgroundImage { get; set; }
-
-        private string backgroundImage = "_content/Mobsites.Blazor.SignaturePad/blazor.png";
-        
-        /// <summary>
-        /// Background image override. Defaults to '_content/Mobsites.Blazor.SignaturePad/blazor.png'.
-        /// </summary>
-        [Parameter] public string BackgroundImage 
-        { 
-            get => backgroundImage; 
-            set 
-            { 
-                if (!string.IsNullOrEmpty(value))
-                {
-                    backgroundImage = value;
-                } 
-            } 
-        }
-
-         private int backgroundImageWidth = 192;
-        
-        /// <summary>
-        /// Background image width (px) override. Defaults to 192px.
-        /// </summary>
-        [Parameter] public int BackgroundImageWidth 
-        { 
-            get => backgroundImageWidth; 
+            get => imageWidth; 
             set 
             { 
                 if (value > 0)
                 {
-                    backgroundImageWidth = value;
+                    imageWidth = value;
                 } 
             } 
         }
 
-        private int backgroundImageHeight = 192;
+        private int imageHeight = 192;
         
         /// <summary>
-        /// Background image height (px) override. Defaults to 192px.
+        /// Image height in pixels. Defaults to 192px.
         /// </summary>
-        [Parameter] public int BackgroundImageHeight 
+        [Parameter] public int ImageHeight 
         { 
-            get => backgroundImageHeight; 
+            get => imageHeight; 
             set 
             { 
                 if (value > 0)
                 {
-                    backgroundImageHeight = value;
+                    imageHeight = value;
                 } 
             } 
         }
 
         /// <summary>
-        /// The supported image types.
+        /// Image type to save as. Defaults to png.
         /// </summary>
-        public enum SupportedImageTypes
-        {
-            png,
-            jpg,
-            svg
-        }
+        [Parameter] public SupportedSaveAsTypes SaveAsType { get; set; }
+
+        /// <summary>
+        /// Call back event for notifying another component that this property changed. 
+        /// </summary>
+        [Parameter] public EventCallback<SupportedSaveAsTypes> SaveAsTypeChanged { get; set; }
 
         /// <summary>
         /// Callback that is fired when a signature stroke finishes or is removed, or when the signature is cleared.
         /// </summary>
         [Parameter]
-        public EventCallback<ChangeEventArgs> OnChangeCallback { get; set; }
+        public EventCallback<ChangeEventArgs> OnSignatureChange { get; set; }
+
+        /// <summary>
+        /// Clear all state for this UI component and any of its dependents from browser storage.
+        /// </summary>
+        public Task ClearState() => this.ClearState<SignaturePad, Options>().AsTask();
+
+        /// <summary>
+        /// Get signature as data url according to the supported type.
+        /// </summary>
+        public async Task<string> ToDataURL(SupportedSaveAsTypes type)
+        {
+            int _segmentSize = 24576;
+
+            var fileSize = await jsRuntime.InvokeAsync<int>("Mobsites.Blazor.SignaturePad.getDataSize", type.ToString());
+
+            string rtnData = "";
+
+            var numberOfSegments = Math.Floor(fileSize / (double)_segmentSize) + 1;
+            string segmentData;
+
+            for (var i = 0; i < numberOfSegments; i++)
+            {
+                try
+                {
+                    segmentData = await jsRuntime.InvokeAsync<string>(
+                            "Mobsites.Blazor.SignaturePad.receiveSegment", i, type.ToString());
+
+                }
+                catch
+                {
+                    return null;
+                }
+                rtnData += segmentData;
+            }
+            return rtnData;
+        }
+
+        /// <summary>
+        /// Clear signature pad.
+        /// </summary>
+        public Task Clear() => this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.clear").AsTask();
+
+        /// <summary>
+        /// Undo last signature stroke.
+        /// </summary>
+        public Task Undo() => this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.undo").AsTask();
+
+        /// <summary>
+        /// Save signature to file as one of the supported image types.
+        /// </summary>
+        public Task Save(SupportedSaveAsTypes? saveAsType = null) => this.jsRuntime.InvokeVoidAsync(
+            "Mobsites.Blazor.SignaturePad.save", 
+            (saveAsType ?? SaveAsType).ToString())
+            .AsTask();
+
+        /// <summary>
+        /// Invoked from a javascript callback event when a signature changes in some way.
+        /// </summary>
+        [JSInvokable]
+        public Task SignatureChanged()
+        {
+            if (KeepState)
+                this.jsRuntime.InvokeVoidAsync(
+                    "Mobsites.Blazor.SignaturePad.saveSignatureState",
+                    $"Mobsites.Blazor.{this.GetKey<SignaturePad>()}.DataURL",
+                    this.UseSessionStorageForState);
+
+            return this.OnSignatureChange.InvokeAsync(null);
+        }
+
+        /// <summary>
+        /// Invoked from a javascript callback event to signal that the signature needs to be restored.
+        /// </summary>
+        [JSInvokable]
+        public async ValueTask RestoreSignatureState()
+        {
+            if (KeepState)
+                await this.jsRuntime.InvokeVoidAsync(
+                    "Mobsites.Blazor.SignaturePad.restoreSignatureState",
+                    $"Mobsites.Blazor.{this.GetKey<SignaturePad>()}.DataURL",
+                    this.UseSessionStorageForState);
+        }
+
+
+
+        /****************************************************
+        *
+        *  NON-PUBLIC INTERFACE
+        *
+        ****************************************************/
+        
+        private DotNetObjectReference<SignaturePad> self;
+        protected DotNetObjectReference<SignaturePad> Self
+        {
+            get => self ?? (Self = DotNetObjectReference.Create(this));
+            set => self = value;
+        }
+
+        /// <summary>
+        /// Child reference. (Assigned by child.)
+        /// </summary>
+        internal SignaturePadFooter SignaturePadFooter { get; set; }
 
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                _objRef = DotNetObjectReference.Create(this);
-
-                await jsRuntime.InvokeVoidAsync(
-                    "Blazor.SignaturePad.init",
-                    _objRef);
+                await Initialize();
+            }
+            else
+            {
+                await Refresh();
             }
         }
 
-        /// <summary>
-        /// Get signature as data url according to the supported type.
-        /// </summary>
-        public async ValueTask<string> ToDataURL(SupportedImageTypes type) => 
-            await jsRuntime.InvokeAsync<string>(
-                "Blazor.SignaturePad.toDataURL",
-                type.ToString());
-
-        /// <summary>
-        /// Invoked from a javascript callback event when a signature stroke finishes or is removed, or when the signature is cleared.
-        /// </summary>
-        [JSInvokable]
-        public async Task OnEnd()
+        internal async Task Initialize()
         {
-            await OnChangeCallback.InvokeAsync(null);
+            var options = await this.GetState<SignaturePad, Options>();
+
+            if (options is null)
+            {
+                options = this.GetOptions();
+            }
+            else
+            {
+                await this.CheckState(options);
+            }
+
+            // Destroy any lingering js representation.
+            options.Destroy = true;
+
+            this.initialized = await this.jsRuntime.InvokeAsync<bool>(
+                "Mobsites.Blazor.SignaturePad.init",
+                Self,
+                options);
+
+            await this.Save<SignaturePad, Options>(options);
         }
 
-        public void Dispose()
+        internal async Task Refresh()
         {
-            _objRef?.Dispose();
+            var options = await this.GetState<SignaturePad, Options>();
+            
+            // Use current state if...
+            if (this.initialized || options is null)
+            {
+                options = this.GetOptions();
+            }
+
+            this.initialized = await this.jsRuntime.InvokeAsync<bool>(
+                "Mobsites.Blazor.SignaturePad.refresh",
+                Self,
+                options);
+
+            await this.Save<SignaturePad, Options>(options);
+        }
+
+        internal Options GetOptions()
+        {
+            var options = new Options 
+            {
+                
+            };
+
+            base.SetOptions(options);
+            this.SignaturePadFooter?.SetOptions(options);
+
+            return options;
+        }
+
+        internal async Task CheckState(Options options)
+        {
+            bool stateChanged = false;
+
+            if (this.SaveAsType != (options.SaveAsType ?? SupportedSaveAsTypes.png))
+            {
+                this.SaveAsType = options.SaveAsType ?? SupportedSaveAsTypes.png;
+                await this.SaveAsTypeChanged.InvokeAsync(this.SaveAsType);
+                stateChanged = true;
+            }
+
+            bool baseStateChanged = await base.CheckState(options);
+            bool footerStateChanged = await this.SignaturePadFooter?.CheckState(options);
+
+            if (stateChanged
+                || baseStateChanged 
+                || footerStateChanged)
+                StateHasChanged();
+        }
+
+        /// <summary>
+        /// Internal helper only. 
+        /// User can externally change pen color via the Color property.
+        /// </summary>
+        internal async Task ChangePenColor(string color)
+        {
+            Color = color;
+            await this.ColorChanged.InvokeAsync(color);
+            await this.Save<SignaturePad, Options>(GetOptions());
+        }
+
+        public override void Dispose()
+        {
+            self?.Dispose();
+            this.initialized = false;
         }
     }
 }

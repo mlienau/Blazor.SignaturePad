@@ -1,1 +1,23 @@
-<img id="signature-pad--undo" src="@ImageSource" width="@ImageWidth" height="@ImageHeight" class="signature-pad--undo @Class" @attributes="@ExtraAttributes" />
+@inherits ChildComponent<SignaturePadFooter>
+
+@if (!string.IsNullOrWhiteSpace(Image))
+{
+    <img id="signature-pad--undo" 
+         src="@Image" 
+         width="@ImageWidth" 
+         height="@ImageHeight" 
+         class="signature-pad--undo @Class" 
+         style="@Style"
+         @attributes="@ExtraAttributes"
+         @onclick="Undo" />
+}
+else if (ChildContent != null)
+{
+    <div id="signature-pad--undo" 
+         class="signature-pad--undo signature-pad--action-item @Class" 
+         style="@Style"
+         @attributes="@ExtraAttributes"
+         @onclick="Undo">
+        @ChildContent
+    </div>
+}

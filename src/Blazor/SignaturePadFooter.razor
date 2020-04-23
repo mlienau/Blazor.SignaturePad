@@ -1,0 +1,14 @@
+@inherits Subcomponent<SignaturePad>
+
+<div class="signature-pad--footer @Class" style="@Style" @attributes="@ExtraAttributes">
+    @if (!string.IsNullOrWhiteSpace(FooterDirective))
+    {
+        <div class="signature-pad--footer-description">@FooterDirective</div>
+    }
+    @if (ChildContent != null)
+    {
+        <CascadingValue Value="this">
+            <div class="signature-pad--actions">@ChildContent</div>
+        </CascadingValue>
+    }
+</div>

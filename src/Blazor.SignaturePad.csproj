@@ -10,22 +10,23 @@
     <Company>Mobsites</Company>
     <Authors>Allan Mobley</Authors>
     <Copyright>© 2020 Mobsites</Copyright>
-    <Description>A Blazor component library that utilizes Szymon Nowak's javascript library Signature Pad to implement smooth signature drawing on a HTML5 canvas.</Description>
+    <Description>A Blazor UI component for smooth signature drawing on a HTML5 canvas.</Description>
     <PackageId>Mobsites.Blazor.SignaturePad</PackageId>
     <IsPackable>true</IsPackable>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>mobsites-logo.png</PackageIcon>
-    <PackageReleaseNotes>Addressed ios issues for pen color and downloads.</PackageReleaseNotes>
-    <PackageVersion>1.0.0-preview2</PackageVersion>
-    <PackageTags>blazor;signature;pad;canvas;component</PackageTags>
-    <PackageProjectUrl>https://github.com/Mobsites/Blazor.SignaturePad</PackageProjectUrl>
+    <PackageReleaseNotes>Official release.</PackageReleaseNotes>
+    <PackageVersion>1.0.0</PackageVersion>
+    <PackageTags>blazor;component;signature;pad;canvas;</PackageTags>
+    <PackageProjectUrl>https://www.mobsites.com/blazor-signature-pad</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Mobsites/Blazor.SignaturePad</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components" Version="3.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="3.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="3.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="3.1.3" />
+    <PackageReference Include="Mobsites.Blazor.BaseComponents" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>

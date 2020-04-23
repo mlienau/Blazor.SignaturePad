@@ -1,1 +1,23 @@
-<img id="signature-pad--save-@SaveAsType.ToString()" src="@ImageSource" width="@ImageWidth" height="@ImageHeight" class="signature-pad--save @Class" @attributes="@ExtraAttributes" />
+@inherits ChildComponent<SignaturePadFooter>
+
+@if (!string.IsNullOrWhiteSpace(Image))
+{
+    <img id="signature-pad--save-@SaveAsType.ToString()" 
+         src="@Image" 
+         width="@ImageWidth" 
+         height="@ImageHeight" 
+         class="signature-pad--save @Class" 
+         style="@Style"
+         @attributes="@ExtraAttributes"
+         @onclick="@(() => Save(SaveAsType))" />
+}
+else if (ChildContent != null)
+{
+    <div id="signature-pad--save-@SaveAsType.ToString()" 
+         class="signature-pad--save signature-pad--action-item @Class" 
+         style="@Style"
+         @attributes="@ExtraAttributes"
+         @onclick="@(() => Save(SaveAsType))">
+        @ChildContent
+    </div>
+}

@@ -1,4 +1,33 @@
-<label>
-    <img id="signature-pad--pen" src="@ImageSource" width="@ImageWidth" height="@ImageHeight" class="signature-pad--pen @Class" @attributes="@ExtraAttributes" />
-    <input type="color" class="signature-pad--pen-color" id="signature-pad--pen-color" />
-</label>
+@inherits ChildComponent<SignaturePadFooter>
+
+@if (!string.IsNullOrWhiteSpace(Image))
+{
+    <label>
+        <img id="signature-pad--pen" 
+             src="@Image" 
+             width="@ImageWidth" 
+             height="@ImageHeight" 
+             class="signature-pad--pen @Class" 
+             style="@Style"
+             @attributes="@ExtraAttributes" />
+        <input type="color" 
+               class="signature-pad--pen-color" 
+               id="signature-pad--pen-color"
+               @onchange="@((e) => ChangeColor(e.Value as string))" />
+    </label>
+}
+else if (ChildContent != null)
+{
+    <label class="signature-pad--action-item">
+        <div id="signature-pad--pen" 
+             class="signature-pad--pen @Class" 
+             style="@Style"
+             @attributes="@ExtraAttributes">
+            @ChildContent
+        <input type="color" 
+               class="signature-pad--pen-color" 
+               id="signature-pad--pen-color"
+               @onchange="@((e) => ChangeColor(e.Value as string))" />
+        </div>
+    </label>
+}

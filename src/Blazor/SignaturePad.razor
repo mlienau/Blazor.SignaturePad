@@ -1,23 +1,24 @@
-<div id="signature-pad" class="signature-pad @Class" @attributes="@ExtraAttributes">
+@inherits StatefulComponent
+
+@{
+    string backgroundColor = BackgroundMode == BackgroundModes.Image 
+        ? $"background-color: {BackgroundColor ?? "white"};" 
+        : null;
+}
+
+<div id="signature-pad" class="signature-pad @Class" style="@Style @backgroundColor" @attributes="@ExtraAttributes">
     <div class="signature-pad--body">
         @{
-            string style = UseBackgroundImage
-                ? $"background: url({BackgroundImage}) center / {BackgroundImageWidth}px {BackgroundImageHeight}px no-repeat;"
+            string background = !string.IsNullOrWhiteSpace(Image) && BackgroundMode != BackgroundModes.Image
+                ? $"background: url({Image}) center / {ImageWidth}px {ImageHeight}px no-repeat;"
                 : null;
         }
-        <canvas id="signature-pad--canvas" style="@style"></canvas>
+        <canvas id="signature-pad--canvas" style="@background"></canvas>
     </div>
-    @if (!(HideFooterDirective && ChildContent is null))
+    @if (ChildContent != null)
     {
-        <div class="signature-pad--footer">
-            @if (!HideFooterDirective)
-            {
-                <div class="signature-pad--footer-description">@FooterDirective</div>
-            }
-            @if (ChildContent != null)
-            {
-                <div class="signature-pad--actions">@ChildContent</div>
-            }
-        </div>
+        <CascadingValue Value="this">
+            @ChildContent
+        </CascadingValue>
     }
 </div>
