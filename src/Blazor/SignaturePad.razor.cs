@@ -4,6 +4,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Threading.Tasks;
+using System;
 
 namespace Mobsites.Blazor
 {
@@ -80,6 +81,41 @@ namespace Mobsites.Blazor
             "Mobsites.Blazor.SignaturePad.toDataURL",
             type.ToString())
             .AsTask();
+        /// <summary>
+        /// Get signature as data url according to the supported type.
+        /// </summary>
+        public async Task<string> ToDataURLServer(SupportedSaveAsTypes type)
+        {
+            //DataUploader uploader = new DataUploader(jsRuntime);
+            ////StreamReader streamReader = new StreamReader(await uploader.ReceiveData(9999999, type.ToString()));
+            //string rtn = await uploader.ReceiveData(9999999, type.ToString());
+            //return rtn;
+
+            int _segmentSize = 24576;
+
+            var fileSize = await jsRuntime.InvokeAsync<int>("Mobsites.Blazor.SignaturePad.getDataSize", type.ToString());
+
+            string rtnData = "";
+
+            var numberOfSegments = Math.Floor(fileSize / (double)_segmentSize) + 1;
+            string segmentData;
+
+            for (var i = 0; i < numberOfSegments; i++)
+            {
+                try
+                {
+                    segmentData = await jsRuntime.InvokeAsync<string>(
+                            "Mobsites.Blazor.SignaturePad.receiveSegment", i, type.ToString());
+
+                }
+                catch
+                {
+                    return null;
+                }
+                rtnData = rtnData + segmentData;
+            }
+            return rtnData;
+        }
 
         /// <summary>
         /// Invoked from a javascript callback event when a signature changes in some way.

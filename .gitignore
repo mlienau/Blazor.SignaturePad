@@ -3,3 +3,11 @@ obj
 pub
 test
 node_modules
+/.vs/Blazor.SignaturePad/v16/.suo
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json
+/src/.vs/Blazor.SignaturePad/v16/.suo
+/src/.vs/Blazor.SignaturePad/DesignTimeBuild/.dtbcache.v2
+/src/Blazor.SignaturePad.csproj.vspscc
+/src/Blazor.SignaturePad.sln
