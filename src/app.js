@@ -153,5 +153,25 @@ window.Mobsites.Blazor.SignaturePad = {
     a.target = '_blank'
     document.body.appendChild(a);
     a.click();
-  }
+    },
+  getDataSize: function (type) {
+        var dataURL = this.toDataURL(type);
+        if (dataURL == null) {
+            return 0;
+        }
+        var dataSize = dataURL.length;
+        return dataSize;
+    },
+  receiveSegment: function (segmentNumber, type) {
+        var dataURL = this.toDataURL(type);
+        var index = segmentNumber * 24576;
+        return getNextChunk(dataURL, index);
+    }
+}
+
+function getNextChunk(dataURL, index) {
+    const length = dataURL.length - index <= 24576 ? dataURL.length - index : 24576;
+    const chunk = dataURL.substring(index, index + length);
+    index += length;
+    return chunk;
 }
