@@ -155,23 +155,23 @@ window.Mobsites.Blazor.SignaturePad = {
     a.click();
     },
   getDataSize: function (type) {
-        var dataURL = this.toDataURL(type);
-        if (dataURL == null) {
-            return 0;
-        }
-        var dataSize = dataURL.length;
-        return dataSize;
+    var dataURL = this.toDataURL(type);
+    if (dataURL == null) {
+        return 0;
+    }
+    var dataSize = dataURL.length;
+    return dataSize;
     },
   receiveSegment: function (segmentNumber, type) {
-        var dataURL = this.toDataURL(type);
-        var index = segmentNumber * 24576;
-        return getNextChunk(dataURL, index);
-    }
-}
-
-function getNextChunk(dataURL, index) {
+    var dataURL = this.toDataURL(type);
+    var index = segmentNumber * 24576;
+    return this.getNextChunk(dataURL, index);
+    },
+  getNextChunk: function (dataURL, index) {
     const length = dataURL.length - index <= 24576 ? dataURL.length - index : 24576;
     const chunk = dataURL.substring(index, index + length);
     index += length;
     return chunk;
+    }
 }
+

@@ -8,3 +8,6 @@ node_modules
 /.vs/slnx.sqlite
 /.vs/VSWorkspaceState.json
 /src/.vs/Blazor.SignaturePad/v16/.suo
+/src/.vs/Blazor.SignaturePad/DesignTimeBuild/.dtbcache.v2
+/src/Blazor.SignaturePad.csproj.vspscc
+/src/Blazor.SignaturePad.sln
