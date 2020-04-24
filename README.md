@@ -33,3 +33,6 @@ Now, not every aspect of his awesome javascript library has been ported over, an
 
 ## Getting Started
 Check out our new [docs](https://www.mobsites.com/blazor/signature-pad) to help you get started.
+
+## Shout Out
+I want to thank [Mike](https://github.com/michaelfw2020) for raising an issue concerning complex signature failures on Blazor Server when calling `toDataUrl()` method as well as his contribution in offering a solution to address this, which was happily added to the source.
