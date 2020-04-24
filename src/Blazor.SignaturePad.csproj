@@ -15,8 +15,8 @@
     <IsPackable>true</IsPackable>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>mobsites-logo.png</PackageIcon>
-    <PackageReleaseNotes>Official release.</PackageReleaseNotes>
-    <PackageVersion>1.0.0</PackageVersion>
+    <PackageReleaseNotes>Actual official release. v1.0.0 was a pipeline release misfire.</PackageReleaseNotes>
+    <PackageVersion>1.1.0</PackageVersion>
     <PackageTags>blazor;component;signature;pad;canvas;</PackageTags>
     <PackageProjectUrl>https://www.mobsites.com/blazor-signature-pad</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
