@@ -5,7 +5,7 @@ trigger:
   tags:
     include:
     - v*
-    
+
 # no PR triggers
 pr: none
 
