@@ -21,11 +21,11 @@ window.Mobsites.Blazor.SignaturePad = {
             this.initialized = true;
             this.initResizeEvent();
             this.resizeCanvas();
+            this.instance.invokeMethodAsync('RestoreSignatureState');
         }
-        if (this.options.color) {
-            this.self.penColor = this.options.color;
-        }
-        this.instance.invokeMethodAsync('RestoreSignatureState');
+        this.self.penColor = this.options.color
+            ? this.options.color
+            : "black";
         return this.initialized;
     },
     refresh: function (instance, options) {
@@ -197,7 +197,12 @@ window.Mobsites.Blazor.SignaturePad = {
             ? sessionStorage.getItem(key)
             : localStorage.getItem(key);
         if (data) {
-            this.self.fromData(JSON.parse(data));
+            var signature = JSON.parse(data);
+            // Add current color to end of signature 
+            // to correctly set pen color after restoring signature.
+            signature.push({ color: this.options.color, points: [{ time: 0, x: 0, y: 0 }]})
+            // Restore signature.
+            this.self.fromData(signature);
         }
     },
 }

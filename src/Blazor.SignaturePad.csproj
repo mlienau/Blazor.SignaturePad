@@ -5,6 +5,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RazorLangVersion>3.0</RazorLangVersion>
+    <LangVersion>latest</LangVersion>
     <RootNamespace>Mobsites</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <Company>Mobsites</Company>
