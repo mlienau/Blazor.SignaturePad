@@ -3,7 +3,14 @@
 <div class="signature-pad--footer @Class" style="@Style" @attributes="@ExtraAttributes">
     @if (!string.IsNullOrWhiteSpace(FooterDirective))
     {
-        <div class="signature-pad--footer-description">@FooterDirective</div>
+        string color = ContrastMode switch 
+        {
+            ContrastModes.Dark => "color: #f2f2f2;",
+            ContrastModes.Light => "color: #121212;",
+            _ => $"color: {Color};"
+        };
+
+        <div class="signature-pad--footer-description" style="@color">@FooterDirective</div>
     }
     @if (ChildContent != null)
     {

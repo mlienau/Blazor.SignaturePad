@@ -86,11 +86,10 @@ namespace Mobsites.Blazor
         /// <summary>
         /// Change pen color.
         /// </summary>
-        public async Task ChangeColor(string color)
-        {
-            await this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.changeColor", color);
-            await base.Parent.Parent.ChangePenColor(color);
-        }
+        public Task ChangeColor(string color) => this.jsRuntime.InvokeVoidAsync(
+            "Mobsites.Blazor.SignaturePad.changePenColor",
+            color)
+            .AsTask();
 
         
 

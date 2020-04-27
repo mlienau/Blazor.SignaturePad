@@ -12,24 +12,25 @@ if (!window.Mobsites) {
 }
 
 window.Mobsites.Blazor.SignaturePad = {
-    init: function (instance, options) {
+    init: function (instance, canvas, options) {
         this.instance = instance;
+        this.canvas = canvas;
         this.options = options;
         if (!this.initialized || this.options.destroy) {
-            this.self = new SignaturePad(document.getElementById('signature-pad--canvas'));
+            this.self = new SignaturePad(canvas);
             this.self.onEnd = this.signatureChanged;
             this.initialized = true;
             this.initResizeEvent();
             this.resizeCanvas();
+            this.instance.invokeMethodAsync('RestoreSignatureState');
         }
-        if (this.options.color) {
-            this.self.penColor = this.options.color;
-        }
-        this.instance.invokeMethodAsync('RestoreSignatureState');
+        this.self.penColor = this.options.color
+            ? this.options.color
+            : "black";
         return this.initialized;
     },
-    refresh: function (instance, options) {
-        return this.init(instance, options);
+    refresh: function (instance, canvas, options) {
+        return this.init(instance, canvas, options);
     },
     initResizeEvent: function () {
         window.addEventListener('resize', this.resizeCanvas);
@@ -39,14 +40,13 @@ window.Mobsites.Blazor.SignaturePad = {
         if (!this.self.isEmpty()) {
             switch (type) {
                 case 'png':
-                    dataURL = this.self.toDataURL('image/png');
+                    dataURL = this.preserveFullSignature('image/png');
                     break;
                 case 'svg':
-                    dataURL = this.self.toDataURL('image/svg+xml');
+                    dataURL = this.preserveFullSignature('image/svg+xml');
                     break;
                 case 'jpg':
-                    // JPEG's are a special case.
-                    dataURL = this.toDataURL_JPEG();
+                    dataURL = this.preserveFullSignature('image/jpeg');
                     break;
                 default:
                     break;
@@ -54,31 +54,12 @@ window.Mobsites.Blazor.SignaturePad = {
         }
         return dataURL;
     },
-    toDataURL_JPEG: function () {
-        // Save current signature.
-        var data = this.self.toData();
-        // It's necessary to use an opaque background color 
-        // when saving image as JPEG and not in dark mode.
-        if (this.options.contrastMode && this.options.contrastMode != 1)
-        {
-            this.self.backgroundColor = 'rgb(255, 255, 255)';
-        }
-        // Write signature back against opaque background.
-        this.self.fromData(data);
-        // Save data url.
-        var dataURL = this.self.toDataURL('image/jpeg');
-        // Reset background to default.
-        this.self.backgroundColor = 'rgba(0,0,0,0)';
-        // Write signature back against default background.
-        this.self.fromData(data);
-        // Return signature against opaque background.
-        return dataURL;
-    },
     signatureChanged: function () {
         window.Mobsites.Blazor.SignaturePad.instance.invokeMethodAsync('SignatureChanged');
     },
-    changeColor: function (color) {
+    changePenColor: function (color) {
         this.self.penColor = color;
+        this.instance.invokeMethodAsync('ChangeColor', color);
     },
     clear: function () {
         this.self.clear();
@@ -93,28 +74,9 @@ window.Mobsites.Blazor.SignaturePad = {
         }
     },
     save: function (saveAsType) {
-        switch (saveAsType) {
-            case 'png':
-                var dataURL = this.self.toDataURL();
-                if (dataURL) {
-                    this.download(dataURL, 'signature.png');
-                }
-                break;
-            case 'jpg':
-                // JPEG's are a special case.
-                var dataURL = this.toDataURL_JPEG();
-                if (dataURL) {
-                    this.download(dataURL, 'signature.jpg');
-                }
-                break;
-            case 'svg':
-                var dataURL = this.self.toDataURL('image/svg+xml');
-                if (dataURL) {
-                    this.download(dataURL, 'signature.svg');
-                }
-                break;
-            default:
-                break;
+        var dataURL = this.toDataURL(saveAsType);
+        if (dataURL) {
+            this.download(dataURL, 'signature.' + saveAsType);
         }
     },
     resizeCanvas: function () {
@@ -122,10 +84,12 @@ window.Mobsites.Blazor.SignaturePad = {
         clearTimeout(this.timeoutId);
         // Delay the resize handling by 200ms
         this.timeoutId = setTimeout(() => {
-            var canvas = document.getElementById('signature-pad--canvas');
+            var canvas = window.Mobsites.Blazor.SignaturePad.canvas;
+            var signaturePad = window.Mobsites.Blazor.SignaturePad.self;
+            //var canvas = document.getElementById('signature-pad--canvas');
             if (canvas) {
                 // Store signature in memory before resizing so as not to lose it.
-                var data = window.Mobsites.Blazor.SignaturePad.self.toData();
+                var data = signaturePad.toData();
 
                 // When zoomed out to less than 100%, for some very strange reason,
                 // some browsers report devicePixelRatio as less than 1
@@ -142,12 +106,12 @@ window.Mobsites.Blazor.SignaturePad = {
                 // canvas looks empty, because the internal data of this library wasn't cleared. To make sure
                 // that the state of this library is consistent with visual state of the canvas, you
                 // have to clear it manually.
-                window.Mobsites.Blazor.SignaturePad.self.clear();
+                signaturePad.clear();
 
                 // Write signature back.
-                window.Mobsites.Blazor.SignaturePad.self.fromData(data);
+                signaturePad.fromData(data);
             }
-        }, 200);
+        }, 300);
     },
     download: function (dataURL, filename) {
         var a = document.createElement('a');
@@ -197,7 +161,44 @@ window.Mobsites.Blazor.SignaturePad = {
             ? sessionStorage.getItem(key)
             : localStorage.getItem(key);
         if (data) {
-            this.self.fromData(JSON.parse(data));
+            var signature = JSON.parse(data);
+            // Add current color to end of signature 
+            // to correctly set pen color after restoring signature.
+            signature.push({ color: this.options.color, points: [{ time: 0, x: 0, y: 0 }]})
+            // Restore signature.
+            this.self.fromData(signature);
         }
     },
+    preserveFullSignature: function (type) {
+        if (!this.fullSignaturePad) {
+            // Create a new Signature Pad just for this purpose
+            var canvas = document.createElement('canvas');
+            // Max dimensions.
+            canvas.width = 700;
+            canvas.height = 460;
+            this.fullSignaturePad = new SignaturePad(canvas);
+        }
+        this.fullSignaturePad.fromData(this.self.toData());
+        var dataURL = type.includes('jpeg') 
+            ? this.toDataURL_JPEG()
+            : this.fullSignaturePad.toDataURL(type);
+        this.fullSignaturePad.clear();
+        return dataURL;
+    },
+    toDataURL_JPEG: function () {
+        var data = this.fullSignaturePad.toData();
+        // It's necessary to use an opaque background color 
+        // when saving image as JPEG and not in dark mode.
+        if (!this.options.contrastMode || this.options.contrastMode != 1)
+        {
+            this.fullSignaturePad.backgroundColor = 'rgb(255, 255, 255)';
+        }
+        // Write signature back against opaque background.
+        this.fullSignaturePad.fromData(data);
+        // Save data url.
+        var dataURL = this.fullSignaturePad.toDataURL('image/jpeg');
+        // Reset background to default.
+        this.fullSignaturePad.backgroundColor = 'rgba(0,0,0,0)';
+        return dataURL;
+    }
 }

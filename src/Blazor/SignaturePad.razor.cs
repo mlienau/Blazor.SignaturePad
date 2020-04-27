@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Threading.Tasks;
 using System;
+using System.Runtime.InteropServices;
 
 namespace Mobsites.Blazor
 {
@@ -87,33 +88,9 @@ namespace Mobsites.Blazor
         /// <summary>
         /// Get signature as data url according to the supported type.
         /// </summary>
-        public async Task<string> ToDataURL(SupportedSaveAsTypes type)
-        {
-            int _segmentSize = 24576;
-
-            var fileSize = await jsRuntime.InvokeAsync<int>("Mobsites.Blazor.SignaturePad.getDataSize", type.ToString());
-
-            string rtnData = "";
-
-            var numberOfSegments = Math.Floor(fileSize / (double)_segmentSize) + 1;
-            string segmentData;
-
-            for (var i = 0; i < numberOfSegments; i++)
-            {
-                try
-                {
-                    segmentData = await jsRuntime.InvokeAsync<string>(
-                            "Mobsites.Blazor.SignaturePad.receiveSegment", i, type.ToString());
-
-                }
-                catch
-                {
-                    return null;
-                }
-                rtnData += segmentData;
-            }
-            return rtnData;
-        }
+        public Task<string> ToDataURL(SupportedSaveAsTypes saveAsType) => isWasm
+            ? ToDataURLWasm(saveAsType)
+            : ToDataURLServer(saveAsType);
 
         /// <summary>
         /// Clear signature pad.
@@ -132,6 +109,37 @@ namespace Mobsites.Blazor
             "Mobsites.Blazor.SignaturePad.save", 
             (saveAsType ?? SaveAsType).ToString())
             .AsTask();
+
+        /// <summary>
+        /// Change pen color.
+        /// </summary>
+        public Task ChangePenColor(string color) => this.jsRuntime.InvokeVoidAsync(
+            "Mobsites.Blazor.SignaturePad.changePenColor", 
+            color)
+            .AsTask();
+
+        /// <summary>
+        /// Invoked from a javascript when pen color is changed.
+        /// For internal use only. ChangePenColor() is for external use.
+        /// </summary>
+        [JSInvokable]
+        public async Task ChangeColor(string color)
+        {
+            switch (ContrastMode)
+            {
+                case ContrastModes.Dark:
+                    this.DarkModeColor = color;
+                    break;
+                case ContrastModes.Light:
+                    this.LightModeColor = color;
+                    break;
+                default:
+                    this.Color = color;
+                    break;
+            }
+            await this.ColorChanged.InvokeAsync(color);
+            await this.Save<SignaturePad, Options>(GetOptions());
+        }
 
         /// <summary>
         /// Invoked from a javascript callback event when a signature changes in some way.
@@ -168,6 +176,8 @@ namespace Mobsites.Blazor
         *  NON-PUBLIC INTERFACE
         *
         ****************************************************/
+
+        private bool isWasm => RuntimeInformation.IsOSPlatform(OSPlatform.Create("WEBASSEMBLY"));
         
         private DotNetObjectReference<SignaturePad> self;
         protected DotNetObjectReference<SignaturePad> Self
@@ -175,6 +185,8 @@ namespace Mobsites.Blazor
             get => self ?? (Self = DotNetObjectReference.Create(this));
             set => self = value;
         }
+
+        protected ElementReference Canvas { get; set; }
 
         /// <summary>
         /// Child reference. (Assigned by child.)
@@ -212,6 +224,7 @@ namespace Mobsites.Blazor
             this.initialized = await this.jsRuntime.InvokeAsync<bool>(
                 "Mobsites.Blazor.SignaturePad.init",
                 Self,
+                Canvas,
                 options);
 
             await this.Save<SignaturePad, Options>(options);
@@ -230,6 +243,7 @@ namespace Mobsites.Blazor
             this.initialized = await this.jsRuntime.InvokeAsync<bool>(
                 "Mobsites.Blazor.SignaturePad.refresh",
                 Self,
+                Canvas,
                 options);
 
             await this.Save<SignaturePad, Options>(options);
@@ -268,21 +282,52 @@ namespace Mobsites.Blazor
                 StateHasChanged();
         }
 
+
         /// <summary>
-        /// Internal helper only. 
-        /// User can externally change pen color via the Color property.
+        /// Internal helper to get signature as data url according to the supported type
+        /// when using Blazor Webassembly.
         /// </summary>
-        internal async Task ChangePenColor(string color)
+        internal Task<string> ToDataURLWasm(SupportedSaveAsTypes saveAsType) => this.jsRuntime.InvokeAsync<string>(
+            "Mobsites.Blazor.SignaturePad.toDataURL",
+            saveAsType.ToString())
+            .AsTask();
+
+        /// <summary>
+        /// Internal helper to get signature as data url according to the supported type
+        /// when using Blazor Server. (Thanks to Mike for this contribution!)
+        /// </summary>
+        public async Task<string> ToDataURLServer(SupportedSaveAsTypes saveAsType)
         {
-            Color = color;
-            await this.ColorChanged.InvokeAsync(color);
-            await this.Save<SignaturePad, Options>(GetOptions());
+            int _segmentSize = 24576;
+
+            var fileSize = await jsRuntime.InvokeAsync<int>("Mobsites.Blazor.SignaturePad.getDataSize", saveAsType.ToString());
+
+            string rtnData = "";
+
+            var numberOfSegments = Math.Floor(fileSize / (double)_segmentSize) + 1;
+            string segmentData;
+
+            for (var i = 0; i < numberOfSegments; i++)
+            {
+                try
+                {
+                    segmentData = await jsRuntime.InvokeAsync<string>(
+                            "Mobsites.Blazor.SignaturePad.receiveSegment", i, saveAsType.ToString());
+
+                }
+                catch
+                {
+                    return null;
+                }
+                rtnData += segmentData;
+            }
+            return rtnData;
         }
 
         public override void Dispose()
         {
             self?.Dispose();
-            this.initialized = false;
+            base.Dispose();
         }
     }
 }
