@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/Mobsites-US/Blazor%20Signature%20Pad/_apis/build/status/Build?branchName=master)](https://dev.azure.com/Mobsites-US/Blazor%20Signature%20Pad/_build/latest?definitionId=7&branchName=master)
+[![Build Status](https://dev.azure.com/Mobsites-US/Blazor%20Signature%20Pad/_apis/build/status/Mobsites.Blazor.SignaturePad?branchName=master)](https://dev.azure.com/Mobsites-US/Blazor%20Signature%20Pad/_build/latest?definitionId=18&branchName=master)
 
 # Blazor Signature Pad
 by <a href="https://www.mobsites.com"><img align="center" src="./src/assets/mobsites-logo.png" width="36" height="36" style="padding-top: 20px;" />obsites</a>
