@@ -11,7 +11,7 @@ A Blazor UI component that utilizes [Szymon Nowak](https://github.com/szimek)'s 
 ## [Demo](https://www.mobsites.com/Blazor.SignaturePad/)
 Tap the link above to go to a live demo. Try some of the options to get an idea of what's possible. Then reload the app in the browser and watch how the state was kept! 
 
-Check out its source code [here](./demo).
+Check out its source code [here](./samples).
 
 ![Gif of Demo](src/assets/demo.gif)
 
