@@ -13,7 +13,7 @@
                 ? $"background: url({Image}) center / {ImageWidth}px {ImageHeight}px no-repeat;"
                 : null;
         }
-        <canvas id="signature-pad--canvas" style="@background"></canvas>
+        <canvas @ref="Canvas" id="signature-pad--canvas" style="@background"></canvas>
     </div>
     @if (ChildContent != null)
     {
