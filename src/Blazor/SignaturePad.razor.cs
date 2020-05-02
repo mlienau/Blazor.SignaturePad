@@ -31,37 +31,39 @@ namespace Mobsites.Blazor
         [Parameter] public string Image { get; set; }
 
         private int imageWidth = 192;
-        
+
         /// <summary>
         /// Image width in pixels. Defaults to 192px.
         /// </summary>
-        [Parameter] public int ImageWidth 
-        { 
-            get => imageWidth; 
-            set 
-            { 
+        [Parameter]
+        public int ImageWidth
+        {
+            get => imageWidth;
+            set
+            {
                 if (value > 0)
                 {
                     imageWidth = value;
-                } 
-            } 
+                }
+            }
         }
 
         private int imageHeight = 192;
-        
+
         /// <summary>
         /// Image height in pixels. Defaults to 192px.
         /// </summary>
-        [Parameter] public int ImageHeight 
-        { 
-            get => imageHeight; 
-            set 
-            { 
+        [Parameter]
+        public int ImageHeight
+        {
+            get => imageHeight;
+            set
+            {
                 if (value > 0)
                 {
                     imageHeight = value;
-                } 
-            } 
+                }
+            }
         }
 
         /// <summary>
@@ -88,25 +90,26 @@ namespace Mobsites.Blazor
         /// <summary>
         /// Get signature as data url according to the supported type.
         /// </summary>
-        public Task<string> ToDataURL(SupportedSaveAsTypes saveAsType) => isWasm
-            ? ToDataURLWasm(saveAsType)
-            : ToDataURLServer(saveAsType);
+        public Task<string> ToDataURL(SupportedSaveAsTypes? saveAsType = null) => isWasm
+            ? ToDataURLWasm(saveAsType ?? SaveAsType)
+            : ToDataURLServer(saveAsType ?? SaveAsType);
 
         /// <summary>
         /// Clear signature pad.
         /// </summary>
-        public Task Clear() => this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.clear").AsTask();
+        public Task Clear() => this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.clear", Self).AsTask();
 
         /// <summary>
         /// Undo last signature stroke.
         /// </summary>
-        public Task Undo() => this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.undo").AsTask();
+        public Task Undo() => this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.undo", Self).AsTask();
 
         /// <summary>
         /// Save signature to file as one of the supported image types.
         /// </summary>
         public Task Save(SupportedSaveAsTypes? saveAsType = null) => this.jsRuntime.InvokeVoidAsync(
-            "Mobsites.Blazor.SignaturePad.save", 
+            "Mobsites.Blazor.SignaturePad.save",
+            Self,
             (saveAsType ?? SaveAsType).ToString())
             .AsTask();
 
@@ -114,7 +117,8 @@ namespace Mobsites.Blazor
         /// Change pen color.
         /// </summary>
         public Task ChangePenColor(string color) => this.jsRuntime.InvokeVoidAsync(
-            "Mobsites.Blazor.SignaturePad.changePenColor", 
+            "Mobsites.Blazor.SignaturePad.changePenColor",
+            Self,
             color)
             .AsTask();
 
@@ -150,6 +154,7 @@ namespace Mobsites.Blazor
             if (KeepState)
                 this.jsRuntime.InvokeVoidAsync(
                     "Mobsites.Blazor.SignaturePad.saveSignatureState",
+                    Self,
                     $"Mobsites.Blazor.{this.GetKey<SignaturePad>()}.DataURL",
                     this.UseSessionStorageForState);
 
@@ -165,6 +170,7 @@ namespace Mobsites.Blazor
             if (KeepState)
                 await this.jsRuntime.InvokeVoidAsync(
                     "Mobsites.Blazor.SignaturePad.restoreSignatureState",
+                    Self,
                     $"Mobsites.Blazor.{this.GetKey<SignaturePad>()}.DataURL",
                     this.UseSessionStorageForState);
         }
@@ -178,7 +184,7 @@ namespace Mobsites.Blazor
         ****************************************************/
 
         private bool isWasm => RuntimeInformation.IsOSPlatform(OSPlatform.Create("WEBASSEMBLY"));
-        
+
         private DotNetObjectReference<SignaturePad> self;
         protected DotNetObjectReference<SignaturePad> Self
         {
@@ -186,7 +192,9 @@ namespace Mobsites.Blazor
             set => self = value;
         }
 
-        protected ElementReference Canvas { get; set; }
+        internal ElementReference ElemRef { get; set; }
+
+        internal ElementReference Canvas { get; set; }
 
         /// <summary>
         /// Child reference. (Assigned by child.)
@@ -224,8 +232,15 @@ namespace Mobsites.Blazor
             this.initialized = await this.jsRuntime.InvokeAsync<bool>(
                 "Mobsites.Blazor.SignaturePad.init",
                 Self,
-                Canvas,
+                new
+                {
+                    Container = this.ElemRef,
+                    this.Canvas
+                },
                 options);
+
+            // Reset before saving state.
+            options.Destroy = false;
 
             await this.Save<SignaturePad, Options>(options);
         }
@@ -233,7 +248,7 @@ namespace Mobsites.Blazor
         internal async Task Refresh()
         {
             var options = await this.GetState<SignaturePad, Options>();
-            
+
             // Use current state if...
             if (this.initialized || options is null)
             {
@@ -243,21 +258,27 @@ namespace Mobsites.Blazor
             this.initialized = await this.jsRuntime.InvokeAsync<bool>(
                 "Mobsites.Blazor.SignaturePad.refresh",
                 Self,
-                Canvas,
+                new
+                {
+                    Container = this.ElemRef,
+                    this.Canvas
+                },
                 options);
+
+            // Reset before saving state.
+            options.Destroy = false;
 
             await this.Save<SignaturePad, Options>(options);
         }
 
         internal Options GetOptions()
         {
-            var options = new Options 
+            var options = new Options
             {
-                
+
             };
 
             base.SetOptions(options);
-            this.SignaturePadFooter?.SetOptions(options);
 
             return options;
         }
@@ -274,11 +295,8 @@ namespace Mobsites.Blazor
             }
 
             bool baseStateChanged = await base.CheckState(options);
-            bool footerStateChanged = await this.SignaturePadFooter?.CheckState(options);
 
-            if (stateChanged
-                || baseStateChanged 
-                || footerStateChanged)
+            if (stateChanged || baseStateChanged)
                 StateHasChanged();
         }
 
@@ -289,6 +307,7 @@ namespace Mobsites.Blazor
         /// </summary>
         internal Task<string> ToDataURLWasm(SupportedSaveAsTypes saveAsType) => this.jsRuntime.InvokeAsync<string>(
             "Mobsites.Blazor.SignaturePad.toDataURL",
+            Self,
             saveAsType.ToString())
             .AsTask();
 
@@ -296,11 +315,14 @@ namespace Mobsites.Blazor
         /// Internal helper to get signature as data url according to the supported type
         /// when using Blazor Server. (Thanks to Mike for this contribution!)
         /// </summary>
-        public async Task<string> ToDataURLServer(SupportedSaveAsTypes saveAsType)
+        internal async Task<string> ToDataURLServer(SupportedSaveAsTypes saveAsType)
         {
             int _segmentSize = 24576;
 
-            var fileSize = await jsRuntime.InvokeAsync<int>("Mobsites.Blazor.SignaturePad.getDataSize", saveAsType.ToString());
+            var fileSize = await jsRuntime.InvokeAsync<int>(
+                "Mobsites.Blazor.SignaturePad.getDataSize",
+                Self,
+                saveAsType.ToString());
 
             string rtnData = "";
 
@@ -312,7 +334,10 @@ namespace Mobsites.Blazor
                 try
                 {
                     segmentData = await jsRuntime.InvokeAsync<string>(
-                            "Mobsites.Blazor.SignaturePad.receiveSegment", i, saveAsType.ToString());
+                            "Mobsites.Blazor.SignaturePad.receiveSegment",
+                            Self,
+                            i,
+                            saveAsType.ToString());
 
                 }
                 catch
