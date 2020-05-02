@@ -18,20 +18,20 @@
     <div class="col-12 col-xl-6 mb-3">
         <SignaturePad KeepState
                       Id="Demo"
-                      Color="white"
+                      Color="#5c2d91"
                       @bind-BackgroundMode="BackgroundMode"
                       @bind-BackgroundColorDirection="BackgroundColorDirection"
                       @bind-BackgroundColorStart="BackgroundColorStart" 
                       @bind-BackgroundColorEnd="BackgroundColorEnd"
                       Image="_content/Shared/blazor.png" 
-                      BackgroundImage="_content/Shared/hyades.jpg"
                       @ref="signaturePad" 
+                      @bind-SaveAsType="signatureType"
                       OnSignatureChange="OnSignatureChange">
             <SignaturePadFooter FooterDirective="Sign above">
                 <SignaturePadPen Image="_content/Shared/pen.png" />
                 <SignaturePadClear Image="_content/Shared/clear.png" />
                 <SignaturePadUndo Image="_content/Shared/undo.png" />
-                <SignaturePadSave Image="_content/Shared/save.png" SaveAsType="signatureType" />
+                <SignaturePadSave Image="_content/Shared/save.png" />
             </SignaturePadFooter>
         </SignaturePad>
     </div>
@@ -43,6 +43,35 @@
             <option value="@SignaturePad.SupportedSaveAsTypes.svg">SVG</option>
         </select>
         <textarea rows="10" class="w-100" readonly>@dataURL</textarea>
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col-12 col-xl-6 mb-3">
+        <SignaturePad KeepState
+                      Id="Demo-2"
+                      Color="#5c2d91"
+                      BackgroundMode="BackgroundModes.Image"
+                      ContrastMode="ContrastModes.Dark"
+                      BackgroundImage="_content/Shared/hyades.jpg"
+                      @ref="signaturePad2" 
+                      @bind-SaveAsType="signatureType2"
+                      OnSignatureChange="OnSignatureChange2">
+            <SignaturePadFooter FooterDirective="Sign above">
+                <SignaturePadPen Image="_content/Shared/pen.png" />
+                <SignaturePadClear Image="_content/Shared/clear.png" />
+                <SignaturePadUndo Image="_content/Shared/undo.png" />
+                <SignaturePadSave Image="_content/Shared/save.png" />
+            </SignaturePadFooter>
+        </SignaturePad>
+    </div>
+    <div class="col-12 col-xl-6 mb-3">
+        <h6><b>Below the data url is captured in real-time using SignaturePad callback event:</b></h6>
+        <select @onchange="OnSignatureChange2">
+            <option value="@SignaturePad.SupportedSaveAsTypes.png">PNG</option>
+            <option value="@SignaturePad.SupportedSaveAsTypes.jpg">JPEG</option>
+            <option value="@SignaturePad.SupportedSaveAsTypes.svg">SVG</option>
+        </select>
+        <textarea rows="10" class="w-100" readonly>@dataURL2</textarea>
     </div>
 </div>
 <div class="row mb-3">
@@ -64,15 +93,6 @@
                     id="light-mode" 
                     @onchange="@((e) => BackgroundMode = BackgroundModes.Light)" />
                 <label class="form-check-label" for="light-mode">Light Mode</label>
-            </div>
-            <div class="form-group form-check">
-                <input 
-                    checked=@(BackgroundMode == BackgroundModes.Image) 
-                    type="radio" 
-                    class="form-check-input" 
-                    id="use-background-image" 
-                    @onchange="@((e) => BackgroundMode = BackgroundModes.Image)" />
-                <label class="form-check-label" for="use-background-image">Use Background Image</label>
             </div>
             <div class="form-group form-check">
                 <input 
@@ -141,8 +161,11 @@
 
 @code {
     SignaturePad signaturePad;
+    SignaturePad signaturePad2;
     SignaturePad.SupportedSaveAsTypes signatureType;
+    SignaturePad.SupportedSaveAsTypes signatureType2;
     string dataURL;
+    string dataURL2;
 
     private async Task OnSignatureChange(ChangeEventArgs eventArgs)
     {
@@ -152,6 +175,15 @@
         }
 
         dataURL = await signaturePad.ToDataURL(signatureType);
+    }
+    private async Task OnSignatureChange2(ChangeEventArgs eventArgs)
+    {
+        if (eventArgs?.Value != null)
+        {
+            signatureType2 = (SignaturePad.SupportedSaveAsTypes)Enum.Parse(typeof(SignaturePad.SupportedSaveAsTypes), eventArgs.Value as string);
+        }
+
+        dataURL2 = await signaturePad2.ToDataURL(signatureType2);
     }
 
     private BackgroundModes backgroundMode = BackgroundModes.Gradient;

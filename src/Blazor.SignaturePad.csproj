@@ -16,8 +16,8 @@
     <IsPackable>true</IsPackable>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>mobsites-logo.png</PackageIcon>
-    <PackageReleaseNotes>Updated dependencies. Fixed signature preservation when saving after screen resize or device rotation.</PackageReleaseNotes>
-    <PackageVersion>1.1.1</PackageVersion>
+    <PackageReleaseNotes>Fixed multiple pads on same page issue.</PackageReleaseNotes>
+    <PackageVersion>1.1.2</PackageVersion>
     <PackageTags>blazor;component;signature;pad;canvas;</PackageTags>
     <PackageProjectUrl>https://www.mobsites.com/blazor-signature-pad</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>

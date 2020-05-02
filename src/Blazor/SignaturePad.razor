@@ -1,12 +1,13 @@
 @inherits StatefulComponent
 
 @{
+    string id = Id ?? "signature-pad";
     string backgroundColor = BackgroundMode == BackgroundModes.Image 
         ? $"background-color: {BackgroundColor ?? "white"};" 
         : null;
 }
 
-<div id="signature-pad" class="signature-pad @Class" style="@Style @backgroundColor" @attributes="@ExtraAttributes">
+<div @ref="ElemRef" id="@id" class="signature-pad @Class" style="@Style @backgroundColor" @attributes="@ExtraAttributes">
     <div class="signature-pad--body">
         @{
             string background = !string.IsNullOrWhiteSpace(Image) && BackgroundMode != BackgroundModes.Image
@@ -15,7 +16,11 @@
         }
         <canvas @ref="Canvas" id="signature-pad--canvas" style="@background"></canvas>
     </div>
-    @if (ChildContent != null)
+    @if (ChildContent is null)
+    {
+        <div style="padding-bottom: 8px;"></div>
+    }
+    else
     {
         <CascadingValue Value="this">
             @ChildContent

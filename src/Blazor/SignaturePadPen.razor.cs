@@ -3,7 +3,6 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace Mobsites.Blazor
 {
@@ -19,7 +18,7 @@ namespace Mobsites.Blazor
         *  PUBLIC INTERFACE
         *
         ****************************************************/
-         
+
         /// <summary>
         /// Content to render.
         /// </summary>
@@ -33,7 +32,8 @@ namespace Mobsites.Blazor
         /// <summary>
         /// The foreground color for this component. Accepts any valid css color usage.
         /// </summary>
-        [Parameter] public override string Color
+        [Parameter]
+        public override string Color
         {
             get => base.Color ?? "black";
             set => base.Color = value;
@@ -43,55 +43,54 @@ namespace Mobsites.Blazor
         /// Whether to inherit a parent's background colors (dark, light, or normal modes).
         /// </summary>
         [Parameter] public override bool InheritParentBackgroundColors { get; set; } = true;
-        
+
         /// <summary>
         /// URL or URL fragment for image source.
         /// </summary>
         [Parameter] public string Image { get; set; }
 
         private int imageWidth = 36;
-        
+
         /// <summary>
         /// Image width in pixels. Defaults to 36px.
         /// </summary>
-        [Parameter] public int ImageWidth 
-        { 
-            get => imageWidth; 
-            set 
-            { 
+        [Parameter]
+        public int ImageWidth
+        {
+            get => imageWidth;
+            set
+            {
                 if (value > 0)
                 {
                     imageWidth = value;
-                } 
-            } 
+                }
+            }
         }
 
         private int imageHeight = 36;
-        
+
         /// <summary>
         /// Image height in pixels. Defaults to 36px.
         /// </summary>
-        [Parameter] public int ImageHeight 
-        { 
-            get => imageHeight; 
-            set 
-            { 
+        [Parameter]
+        public int ImageHeight
+        {
+            get => imageHeight;
+            set
+            {
                 if (value > 0)
                 {
                     imageHeight = value;
-                } 
-            } 
+                }
+            }
         }
 
         /// <summary>
         /// Change pen color.
         /// </summary>
-        public Task ChangeColor(string color) => this.jsRuntime.InvokeVoidAsync(
-            "Mobsites.Blazor.SignaturePad.changePenColor",
-            color)
-            .AsTask();
+        public Task ChangeColor(string color) => this.Parent.Parent.ChangePenColor(color);
 
-        
+
 
         /****************************************************
         *
@@ -104,21 +103,6 @@ namespace Mobsites.Blazor
             // This will check for valid parent.
             base.OnParametersSet();
             base.Parent.SignaturePadPen = this;
-        }
-
-        internal void SetOptions(SignaturePad.Options options)
-        {
-            options.SignaturePadPen = new Options 
-            {
-                
-            };
-
-            base.SetOptions(options.SignaturePadPen);
-        }
-
-        internal async Task<bool> CheckState(SignaturePad.Options options)
-        {
-            return await base.CheckState(options.SignaturePadPen);
         }
     }
 }

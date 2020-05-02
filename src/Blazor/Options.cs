@@ -24,21 +24,15 @@ namespace Mobsites.Blazor
             *   be accounted for there as not defined.
             *
             ***********************************************************************/
-            
+
             public bool Destroy { get; set; }
 
             private SupportedSaveAsTypes? saveAsType;
             public SupportedSaveAsTypes? SaveAsType
-            { 
-                get => saveAsType; 
-                set => saveAsType = this.NullOnZero<SupportedSaveAsTypes?>(value); 
+            {
+                get => saveAsType;
+                set => saveAsType = this.NullOnZero<SupportedSaveAsTypes?>(value);
             }
-
-            public SignaturePadFooter.Options SignaturePadFooter { get; set; }
-            public SignaturePadPen.Options SignaturePadPen { get; set; }
-            public SignaturePadClear.Options SignaturePadClear { get; set; }
-            public SignaturePadUndo.Options SignaturePadUndo { get; set; }
-            public SignaturePadSave.Options SignaturePadSave { get; set; }
         }
     }
 }

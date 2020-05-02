@@ -12,41 +12,52 @@ if (!window.Mobsites) {
 }
 
 window.Mobsites.Blazor.SignaturePad = {
-    init: function (instance, canvas, options) {
-        this.instance = instance;
-        this.canvas = canvas;
-        this.options = options;
-        if (!this.initialized || this.options.destroy) {
-            this.self = new SignaturePad(canvas);
-            this.self.onEnd = this.signatureChanged;
-            this.initialized = true;
-            this.initResizeEvent();
-            this.resizeCanvas();
-            this.instance.invokeMethodAsync('RestoreSignatureState');
+    init: function (dotNetObjRef, elemRefs, options) {
+        try {
+            if (!this.pads) {
+                this.pads = [];
+            }
+            if (!this.pads[dotNetObjRef._id] || options.destroy) {
+                this.pads[dotNetObjRef._id] = new SignaturePad(elemRefs.canvas);
+                this.pads[dotNetObjRef._id].Blazor = {
+                    dotNetObjRef: dotNetObjRef,
+                    elemRefs: elemRefs,
+                    options: options
+                }
+                this.pads[dotNetObjRef._id].onEnd = this.onEndSignatureChanged;
+                this.initResizeEvent();
+                this.resizeCanvas();
+                this.pads[dotNetObjRef._id].Blazor.dotNetObjRef.invokeMethodAsync('RestoreSignatureState');
+            } else {
+                this.pads[dotNetObjRef._id].Blazor.options = options;
+            }
+            this.pads[dotNetObjRef._id].penColor = this.pads[dotNetObjRef._id].Blazor.options.color
+                ? this.pads[dotNetObjRef._id].Blazor.options.color
+                : "black";
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
         }
-        this.self.penColor = this.options.color
-            ? this.options.color
-            : "black";
-        return this.initialized;
     },
-    refresh: function (instance, canvas, options) {
-        return this.init(instance, canvas, options);
+    refresh: function (dotNetObjRef, elemRefs, options) {
+        return this.init(dotNetObjRef, elemRefs, options);
     },
     initResizeEvent: function () {
         window.addEventListener('resize', this.resizeCanvas);
     },
-    toDataURL: function (type) {
+    toDataURL: function (dotNetObjRef, type) {
         var dataURL = null;
-        if (!this.self.isEmpty()) {
+        if (!this.pads[dotNetObjRef._id].isEmpty()) {
             switch (type) {
                 case 'png':
-                    dataURL = this.preserveFullSignature('image/png');
+                    dataURL = this.preserveFullSignature(dotNetObjRef, 'image/png');
                     break;
                 case 'svg':
-                    dataURL = this.preserveFullSignature('image/svg+xml');
+                    dataURL = this.preserveFullSignature(dotNetObjRef, 'image/svg+xml');
                     break;
                 case 'jpg':
-                    dataURL = this.preserveFullSignature('image/jpeg');
+                    dataURL = this.preserveFullSignature(dotNetObjRef, 'image/jpeg');
                     break;
                 default:
                     break;
@@ -54,27 +65,28 @@ window.Mobsites.Blazor.SignaturePad = {
         }
         return dataURL;
     },
-    signatureChanged: function () {
-        window.Mobsites.Blazor.SignaturePad.instance.invokeMethodAsync('SignatureChanged');
+    onEndSignatureChanged: function () {
+        // Call back for onEnd prop of SignaturePad only!!!!
+        this.Blazor.dotNetObjRef.invokeMethodAsync('SignatureChanged');
     },
-    changePenColor: function (color) {
-        this.self.penColor = color;
-        this.instance.invokeMethodAsync('ChangeColor', color);
+    changePenColor: function (dotNetObjRef, color) {
+        this.pads[dotNetObjRef._id].penColor = color;
+        this.pads[dotNetObjRef._id].Blazor.dotNetObjRef.invokeMethodAsync('ChangeColor', color);
     },
-    clear: function () {
-        this.self.clear();
-        this.signatureChanged();
+    clear: function (dotNetObjRef) {
+        this.pads[dotNetObjRef._id].clear();
+        this.pads[dotNetObjRef._id].Blazor.dotNetObjRef.invokeMethodAsync('SignatureChanged');
     },
-    undo: function () {
-        var data = this.self.toData();
+    undo: function (dotNetObjRef) {
+        var data = this.pads[dotNetObjRef._id].toData();
         if (data) {
             data.pop(); // remove the last dot or line
-            this.self.fromData(data);
-            this.signatureChanged();
+            this.pads[dotNetObjRef._id].fromData(data);
+            this.pads[dotNetObjRef._id].Blazor.dotNetObjRef.invokeMethodAsync('SignatureChanged');
         }
     },
-    save: function (saveAsType) {
-        var dataURL = this.toDataURL(saveAsType);
+    save: function (dotNetObjRef, saveAsType) {
+        var dataURL = this.toDataURL(dotNetObjRef, saveAsType);
         if (dataURL) {
             this.download(dataURL, 'signature.' + saveAsType);
         }
@@ -84,12 +96,9 @@ window.Mobsites.Blazor.SignaturePad = {
         clearTimeout(this.timeoutId);
         // Delay the resize handling by 200ms
         this.timeoutId = setTimeout(() => {
-            var canvas = window.Mobsites.Blazor.SignaturePad.canvas;
-            var signaturePad = window.Mobsites.Blazor.SignaturePad.self;
-            //var canvas = document.getElementById('signature-pad--canvas');
-            if (canvas) {
+            window.Mobsites.Blazor.SignaturePad.pads.forEach(pad => {
                 // Store signature in memory before resizing so as not to lose it.
-                var data = signaturePad.toData();
+                var data = pad.toData();
 
                 // When zoomed out to less than 100%, for some very strange reason,
                 // some browsers report devicePixelRatio as less than 1
@@ -97,20 +106,20 @@ window.Mobsites.Blazor.SignaturePad = {
                 var ratio = Math.max(window.devicePixelRatio || 1, 1);
 
                 // This part causes the canvas to be cleared
-                canvas.width = canvas.offsetWidth * ratio;
-                canvas.height = canvas.offsetHeight * ratio;
-                canvas.getContext('2d').scale(ratio, ratio);
+                pad.canvas.width = pad.canvas.offsetWidth * ratio;
+                pad.canvas.height = pad.canvas.offsetHeight * ratio;
+                pad.canvas.getContext('2d').scale(ratio, ratio);
 
                 // This library does not listen for canvas changes, so after the canvas is automatically
                 // cleared by the browser, SignaturePad#isEmpty might still return false, even though the
                 // canvas looks empty, because the internal data of this library wasn't cleared. To make sure
                 // that the state of this library is consistent with visual state of the canvas, you
                 // have to clear it manually.
-                signaturePad.clear();
+                pad.clear();
 
                 // Write signature back.
-                signaturePad.fromData(data);
-            }
+                pad.fromData(data);
+            });
         }, 300);
     },
     download: function (dataURL, filename) {
@@ -122,16 +131,16 @@ window.Mobsites.Blazor.SignaturePad = {
         document.body.appendChild(a);
         a.click();
     },
-    getDataSize: function (type) {
-        var dataURL = this.toDataURL(type);
+    getDataSize: function (dotNetObjRef, type) {
+        var dataURL = this.toDataURL(dotNetObjRef, type);
         if (dataURL == null) {
             return 0;
         }
         var dataSize = dataURL.length;
         return dataSize;
     },
-    receiveSegment: function (segmentNumber, type) {
-        var dataURL = this.toDataURL(type);
+    receiveSegment: function (dotNetObjRef, segmentNumber, type) {
+        var dataURL = this.toDataURL(dotNetObjRef, type);
         var index = segmentNumber * 24576;
         return this.getNextChunk(dataURL, index);
     },
@@ -141,8 +150,8 @@ window.Mobsites.Blazor.SignaturePad = {
         index += length;
         return chunk;
     },
-    saveSignatureState: function (key, useSession) {
-        const data = this.self.toData();
+    saveSignatureState: function (dotNetObjRef, key, useSession) {
+        const data = this.pads[dotNetObjRef._id].toData();
         if (data && data.length > 0) {
             if (useSession)
                 sessionStorage.setItem(key, JSON.stringify(data));
@@ -156,7 +165,7 @@ window.Mobsites.Blazor.SignaturePad = {
         }
         
     },
-    restoreSignatureState: function (key, useSession) {
+    restoreSignatureState: function (dotNetObjRef, key, useSession) {
         const data = useSession 
             ? sessionStorage.getItem(key)
             : localStorage.getItem(key);
@@ -164,32 +173,32 @@ window.Mobsites.Blazor.SignaturePad = {
             var signature = JSON.parse(data);
             // Add current color to end of signature 
             // to correctly set pen color after restoring signature.
-            signature.push({ color: this.options.color, points: [{ time: 0, x: 0, y: 0 }]})
+            signature.push({ color: this.pads[dotNetObjRef._id].Blazor.options.color, points: [{ time: 0, x: 0, y: 0 }]})
             // Restore signature.
-            this.self.fromData(signature);
+            this.pads[dotNetObjRef._id].fromData(signature);
         }
     },
-    preserveFullSignature: function (type) {
+    preserveFullSignature: function (dotNetObjRef, type) {
         if (!this.fullSignaturePad) {
             // Create a new Signature Pad just for this purpose
             var canvas = document.createElement('canvas');
             // Max dimensions.
             canvas.width = 700;
-            canvas.height = 460;
+            canvas.height = 350;
             this.fullSignaturePad = new SignaturePad(canvas);
         }
-        this.fullSignaturePad.fromData(this.self.toData());
+        this.fullSignaturePad.fromData(this.pads[dotNetObjRef._id].toData());
         var dataURL = type.includes('jpeg') 
-            ? this.toDataURL_JPEG()
+            ? this.toDataURL_JPEG(this.pads[dotNetObjRef._id].Blazor.options.contrastMode)
             : this.fullSignaturePad.toDataURL(type);
         this.fullSignaturePad.clear();
         return dataURL;
     },
-    toDataURL_JPEG: function () {
+    toDataURL_JPEG: function (contrastMode) {
         var data = this.fullSignaturePad.toData();
         // It's necessary to use an opaque background color 
         // when saving image as JPEG and not in dark mode.
-        if (!this.options.contrastMode || this.options.contrastMode != 1)
+        if (!contrastMode || contrastMode != 1)
         {
             this.fullSignaturePad.backgroundColor = 'rgb(255, 255, 255)';
         }

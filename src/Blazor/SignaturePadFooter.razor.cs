@@ -1,7 +1,6 @@
 // Copyright (c) 2020 Allan Mobley. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
 namespace Mobsites.Blazor
@@ -21,7 +20,7 @@ namespace Mobsites.Blazor
         /// Content to render.
         /// </summary>
         [Parameter] public RenderFragment ChildContent { get; set; }
-        
+
         /// <summary>
         /// Directive placed directly below signature pad.
         /// </summary>
@@ -35,7 +34,8 @@ namespace Mobsites.Blazor
         /// <summary>
         /// The foreground color for this component. Accepts any valid css color usage.
         /// </summary>
-        [Parameter] public override string Color
+        [Parameter]
+        public override string Color
         {
             get => ContrastMode == ContrastModes.Light ? "black" : base.Color ?? "black";
             set => base.Color = value;
@@ -46,7 +46,7 @@ namespace Mobsites.Blazor
         /// </summary>
         [Parameter] public override bool InheritParentBackgroundColors { get; set; } = true;
 
-        
+
 
         /****************************************************
         *
@@ -79,35 +79,6 @@ namespace Mobsites.Blazor
             // This will check for valid parent.
             base.OnParametersSet();
             base.Parent.SignaturePadFooter = this;
-        }
-
-        internal void SetOptions(SignaturePad.Options options)
-        {
-            options.SignaturePadFooter = new Options 
-            {
-                
-            };
-
-            base.SetOptions(options.SignaturePadFooter);
-            this.SignaturePadPen?.SetOptions(options);
-            this.SignaturePadClear?.SetOptions(options);
-            this.SignaturePadUndo?.SetOptions(options);
-            this.SignaturePadSave?.SetOptions(options);
-        }
-
-        internal async Task<bool> CheckState(SignaturePad.Options options)
-        {
-            bool baseStateChanged = await base.CheckState(options.SignaturePadFooter);
-            bool penStateChanged = await this.SignaturePadPen?.CheckState(options);
-            bool clearStateChanged = await this.SignaturePadClear?.CheckState(options);
-            bool undoStateChanged = await this.SignaturePadUndo?.CheckState(options);
-            bool saveStateChanged = await this.SignaturePadSave?.CheckState(options);
-
-            return baseStateChanged 
-                || penStateChanged
-                || clearStateChanged
-                || undoStateChanged
-                || saveStateChanged;
         }
     }
 }
