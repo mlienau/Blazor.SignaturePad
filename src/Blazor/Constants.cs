@@ -10,8 +10,19 @@ namespace Mobsites.Blazor
         /// </summary>
         public enum SupportedSaveAsTypes
         {
+            /// <summary>
+            /// Save as png.
+            /// </summary>
             png,
+
+            /// <summary>
+            /// Save as jpg.
+            /// </summary>
             jpg,
+
+            /// <summary>
+            /// Save as svg.
+            /// </summary>
             svg
         }
     }

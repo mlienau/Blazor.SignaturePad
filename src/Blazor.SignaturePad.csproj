@@ -16,18 +16,17 @@
     <IsPackable>true</IsPackable>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>mobsites-logo.png</PackageIcon>
-    <PackageReleaseNotes>Fixed multiple pads on same page issue.</PackageReleaseNotes>
-    <PackageVersion>1.1.2</PackageVersion>
+    <PackageReleaseNotes>Add missing xml docs and make components sealed.</PackageReleaseNotes>
+    <PackageVersion>1.1.3</PackageVersion>
     <PackageTags>blazor;component;signature;pad;canvas;</PackageTags>
     <PackageProjectUrl>https://www.mobsites.com/blazor-signature-pad</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Mobsites/Blazor.SignaturePad</RepositoryUrl>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components" Version="3.1.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="3.1.3" />
-    <PackageReference Include="Mobsites.Blazor.BaseComponents" Version="1.0.1" />
+    <PackageReference Include="Mobsites.Blazor.BaseComponents" Version="1.0.2" />
   </ItemGroup>
 
   <ItemGroup>

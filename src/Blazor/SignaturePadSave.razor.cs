@@ -11,7 +11,7 @@ namespace Mobsites.Blazor
     /// housing the functionality for saving to file the signature
     /// of the <see cref="SignaturePad"/> component.
     /// </summary>
-    public partial class SignaturePadSave
+    public sealed partial class SignaturePadSave
     {
         /****************************************************
         *
@@ -98,6 +98,9 @@ namespace Mobsites.Blazor
         *
         ****************************************************/
 
+        /// <summary>
+        /// Life cycle method for when parameters from parent are set.
+        /// </summary>
         protected override void OnParametersSet()
         {
             // This will check for valid parent.

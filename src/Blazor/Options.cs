@@ -28,6 +28,10 @@ namespace Mobsites.Blazor
             public bool Destroy { get; set; }
 
             private SupportedSaveAsTypes? saveAsType;
+
+            /// <summary>
+            /// Option for image type to save as.
+            /// </summary>
             public SupportedSaveAsTypes? SaveAsType
             {
                 get => saveAsType;

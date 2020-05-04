@@ -8,7 +8,7 @@ namespace Mobsites.Blazor
     /// <summary>
     /// UI subcomponent for rendering a footer in the <see cref="SignaturePad"/> component.
     /// </summary>
-    public partial class SignaturePadFooter
+    public sealed partial class SignaturePadFooter
     {
         /****************************************************
         *
@@ -74,6 +74,9 @@ namespace Mobsites.Blazor
         /// </summary>
         internal SignaturePadSave SignaturePadSave { get; set; }
 
+        /// <summary>
+        /// Life cycle method for when parameters from parent are set.
+        /// </summary>
         protected override void OnParametersSet()
         {
             // This will check for valid parent.

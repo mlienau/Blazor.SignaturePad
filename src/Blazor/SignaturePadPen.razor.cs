@@ -11,7 +11,7 @@ namespace Mobsites.Blazor
     /// housing the functionality for changing the pen color 
     /// of the <see cref="SignaturePad"/> component.
     /// </summary>
-    public partial class SignaturePadPen
+    public sealed partial class SignaturePadPen
     {
         /****************************************************
         *
@@ -98,6 +98,9 @@ namespace Mobsites.Blazor
         *
         ****************************************************/
 
+        /// <summary>
+        /// Life cycle method for when parameters from parent are set.
+        /// </summary>
         protected override void OnParametersSet()
         {
             // This will check for valid parent.

@@ -12,7 +12,7 @@ namespace Mobsites.Blazor
     /// <summary>
     /// UI component for smooth signature drawing on a HTML5 canvas.
     /// </summary>
-    public partial class SignaturePad
+    public sealed partial class SignaturePad
     {
         /****************************************************
         *
@@ -90,7 +90,7 @@ namespace Mobsites.Blazor
         /// <summary>
         /// Get signature as data url according to the supported type.
         /// </summary>
-        public Task<string> ToDataURL(SupportedSaveAsTypes? saveAsType = null) => isWasm
+        public Task<string> ToDataURL(SupportedSaveAsTypes? saveAsType = null) => IsWASM
             ? ToDataURLWasm(saveAsType ?? SaveAsType)
             : ToDataURLServer(saveAsType ?? SaveAsType);
 
@@ -183,17 +183,30 @@ namespace Mobsites.Blazor
         *
         ****************************************************/
 
-        private bool isWasm => RuntimeInformation.IsOSPlatform(OSPlatform.Create("WEBASSEMBLY"));
+        /// <summary>
+        /// Whether component environment is Blazor WASM or Server.
+        /// </summary>
+        internal bool IsWASM => RuntimeInformation.IsOSPlatform(OSPlatform.Create("WEBASSEMBLY"));
 
         private DotNetObjectReference<SignaturePad> self;
-        protected DotNetObjectReference<SignaturePad> Self
+
+        /// <summary>
+        /// Net reference passed into javascript representation.
+        /// </summary>
+        internal DotNetObjectReference<SignaturePad> Self
         {
             get => self ?? (Self = DotNetObjectReference.Create(this));
             set => self = value;
         }
 
+        /// <summary>
+        /// Dom element reference passed into javascript representation.
+        /// </summary>
         internal ElementReference ElemRef { get; set; }
 
+        /// <summary>
+        /// Dom element reference passed into javascript representation.
+        /// </summary>
         internal ElementReference Canvas { get; set; }
 
         /// <summary>
@@ -201,6 +214,9 @@ namespace Mobsites.Blazor
         /// </summary>
         internal SignaturePadFooter SignaturePadFooter { get; set; }
 
+        /// <summary>
+        /// Life cycle method for when component has been rendered in the dom and javascript interopt is fully ready.
+        /// </summary>
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -213,6 +229,9 @@ namespace Mobsites.Blazor
             }
         }
 
+        /// <summary>
+        /// Initialize state and javascript representations.
+        /// </summary>
         internal async Task Initialize()
         {
             var options = await this.GetState<SignaturePad, Options>();
@@ -245,6 +264,9 @@ namespace Mobsites.Blazor
             await this.Save<SignaturePad, Options>(options);
         }
 
+        /// <summary>
+        /// Refresh state and javascript representations.
+        /// </summary>
         internal async Task Refresh()
         {
             var options = await this.GetState<SignaturePad, Options>();
@@ -271,6 +293,9 @@ namespace Mobsites.Blazor
             await this.Save<SignaturePad, Options>(options);
         }
 
+        /// <summary>
+        /// Get current or storage-saved options for keeping state.
+        /// </summary>
         internal Options GetOptions()
         {
             var options = new Options
@@ -283,6 +308,10 @@ namespace Mobsites.Blazor
             return options;
         }
 
+        /// <summary>
+        /// Check whether storage-retrieved options are different than current
+        /// and thereby need to notify parents of change when keeping state.
+        /// </summary>
         internal async Task CheckState(Options options)
         {
             bool stateChanged = false;
@@ -349,6 +378,9 @@ namespace Mobsites.Blazor
             return rtnData;
         }
 
+        /// <summary>
+        /// Called by GC.
+        /// </summary>
         public override void Dispose()
         {
             self?.Dispose();
