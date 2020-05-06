@@ -8,7 +8,7 @@ A Blazor UI component that utilizes [Szymon Nowak](https://github.com/szimek)'s 
 
 ***Don't worry! You don't have to touch any javascript to make use of this library. Blazor Signature Pad abstracts all of that away for you. Just plug and play, baby.***
 
-## [Demo](https://www.mobsites.com/Blazor.SignaturePad/)
+## [Demo](https://signaturepad.mobsites.com)
 
 Tap the link above to go to a live demo. Try some of the options to get an idea of what's possible. Then reload the app in the browser and watch how the state was kept! 
 
