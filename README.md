@@ -47,4 +47,4 @@ Next check out our new [docs](https://www.mobsites.com/blazor/signature-pad) to 
 
 ## Shout Out
 
-I want to thank [Mike](https://github.com/michaelfw2020) for raising this [issue](https://github.com/Mobsites/Blazor.SignaturePad/issues/2) concerning complex signature failures on Blazor Server when calling `toDataUrl()` method as well as his contribution to address this, which was happily merged into the source.
+I want to thank [Mike](https://github.com/michaelfw2020) for raising this [issue](https://github.com/Mobsites/Blazor.SignaturePad/issues/2) concerning complex signature failures on Blazor Server when calling `toDataUrl()` method and more importantly his contribution to address this, which was happily merged into the source.

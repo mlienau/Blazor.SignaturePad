@@ -277,14 +277,9 @@ namespace Mobsites.Blazor
                 options = this.GetOptions();
             }
 
-            this.initialized = await this.jsRuntime.InvokeAsync<bool>(
+            await this.jsRuntime.InvokeVoidAsync(
                 "Mobsites.Blazor.SignaturePad.refresh",
                 Self,
-                new
-                {
-                    Container = this.ElemRef,
-                    this.Canvas
-                },
                 options);
 
             // Reset before saving state.
@@ -383,6 +378,7 @@ namespace Mobsites.Blazor
         /// </summary>
         public override void Dispose()
         {
+            jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePad.destroy", Self);
             self?.Dispose();
             base.Dispose();
         }

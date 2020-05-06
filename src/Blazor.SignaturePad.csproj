@@ -16,8 +16,11 @@
     <IsPackable>true</IsPackable>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>mobsites-logo.png</PackageIcon>
-    <PackageReleaseNotes>Add missing xml docs and make components sealed.</PackageReleaseNotes>
-    <PackageVersion>1.1.3</PackageVersion>
+    <PackageReleaseNotes>
+        Addressed multiple pads on same page leaving dangling javascript representations in memory on navigation from and back to page again. 
+        Cleaned up and refactored javascript.
+    </PackageReleaseNotes>
+    <PackageVersion>1.1.4</PackageVersion>
     <PackageTags>blazor;component;signature;pad;canvas;</PackageTags>
     <PackageProjectUrl>https://www.mobsites.com/blazor-signature-pad</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
