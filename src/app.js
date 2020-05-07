@@ -11,14 +11,14 @@ if (!window.Mobsites) {
     };
 }
 
-window.Mobsites.Blazor.SignaturePad = {
-    pads: [],
-    offset: 1,
+window.Mobsites.Blazor.SignaturePads = {
+    store: [],
     init: function (dotNetObjRef, elemRefs, options) {
         try {
-            this.pads[dotNetObjRef._id - this.offset] = new Mobsites_Blazor_SignaturePad(dotNetObjRef, elemRefs, options);
-            this.pads[dotNetObjRef._id - this.offset].dotNetObjRef.invokeMethodAsync('RestoreSignatureState');
-            this.pads[dotNetObjRef._id - this.offset].resizeCanvas();
+            const index = this.add(new Mobsites_Blazor_SignaturePad(dotNetObjRef, elemRefs, options));
+            dotNetObjRef.invokeMethodAsync('SetIndex', index);
+            dotNetObjRef.invokeMethodAsync('RestoreSignatureState');
+            this.store[index].resizeCanvas();
             this.initResizeEvent();
             return true;
         } catch (error) {
@@ -26,16 +26,25 @@ window.Mobsites.Blazor.SignaturePad = {
             return false;
         }
     },
-    refresh: function (dotNetObjRef, options) {
-        this.pads[dotNetObjRef._id - this.offset].update(options);
+    add: function (signaturePad) {
+        for (let i = 0; i < this.store.length; i++) {
+            if (this.store[i] == null) {
+                this.store[i] = signaturePad;
+                return i;
+            }
+        }
+        const index = this.store.length;
+        this.store[index] = signaturePad;
+        return index;
     },
-    destroy: function (dotNetObjRef) {
-        this.pads[dotNetObjRef._id - this.offset] = null;
-        this.pads.splice(dotNetObjRef._id - this.offset, 1);
-        this.offset++;
+    update: function (index, options) {
+        this.store[index].update(options);
+    },
+    destroy: function (index) {
+        this.store[index] = null;
     },
     initResizeEvent: function () {
-        if (this.pads.length == 1)
+        if (this.store.length == 1)
             window.addEventListener('resize', this.resizeCanvas);
     },
     resizeCanvas: function () {
@@ -43,38 +52,38 @@ window.Mobsites.Blazor.SignaturePad = {
         clearTimeout(this.timeoutId);
         // Delay the resize handling by 200ms
         this.timeoutId = setTimeout(() => {
-            window.Mobsites.Blazor.SignaturePad.pads.forEach(pad => {
-                pad.resizeCanvas();
+            window.Mobsites.Blazor.SignaturePads.store.forEach(pad => {
+                if (pad)
+                    pad.resizeCanvas();
             });
         }, 300);
     },
-    toDataURL: function (dotNetObjRef, type) {
-        return this.pads[dotNetObjRef._id - this.offset]._toDataURL(type);
+    toDataURL: function (index, type) {
+        return this.store[index]._toDataURL(type);
     },
-    changePenColor: function (dotNetObjRef, color) {
-        this.pads[dotNetObjRef._id - this.offset].changePenColor(color);
+    changePenColor: function (index, color) {
+        this.store[index].changePenColor(color);
     },
-    clear: function (dotNetObjRef) {
-        this.pads[dotNetObjRef._id - this.offset]._clear();
+    clear: function (index) {
+        this.store[index]._clear();
     },
-    undo: function (dotNetObjRef) {
-        this.pads[dotNetObjRef._id - this.offset].undo();
+    undo: function (index) {
+        this.store[index].undo();
     },
-    save: function (dotNetObjRef, saveAsType) {
-        this.pads[dotNetObjRef._id - this.offset].save(saveAsType);
+    save: function (index, saveAsType) {
+        this.store[index].save(saveAsType);
     },
-    getDataSize: function (dotNetObjRef, type) {
-        const dataURL = this.pads[dotNetObjRef._id - this.offset]._toDataURL(type);
+    getDataSize: function (index, type) {
+        const dataURL = this.store[index]._toDataURL(type);
         if (dataURL == null) {
             return 0;
         }
         const dataSize = dataURL.length;
         return dataSize;
     },
-    receiveSegment: function (dotNetObjRef, segmentNumber, type) {
-        const dataURL = this.pads[dotNetObjRef._id - this.offset]._toDataURL(type);
-        const index = segmentNumber * 24576;
-        return this.getNextChunk(dataURL, index);
+    receiveSegment: function (index, segmentNumber, type) {
+        const dataURL = this.store[index]._toDataURL(type);
+        return this.getNextChunk(dataURL, segmentNumber * 24576);
     },
     getNextChunk: function (dataURL, index) {
         const length = dataURL.length - index <= 24576 ? dataURL.length - index : 24576;
@@ -82,11 +91,11 @@ window.Mobsites.Blazor.SignaturePad = {
         index += length;
         return chunk;
     },
-    saveSignatureState: function (dotNetObjRef, key, useSession) {
-        this.pads[dotNetObjRef._id - this.offset].saveSignatureState(key, useSession);
+    saveSignatureState: function (index, key, useSession) {
+        this.store[index].saveSignatureState(key, useSession);
     },
-    restoreSignatureState: function (dotNetObjRef, key, useSession) {
-        this.pads[dotNetObjRef._id - this.offset].restoreSignatureState(key, useSession);
+    restoreSignatureState: function (index, key, useSession) {
+        this.store[index].restoreSignatureState(key, useSession);
     }
 }
 
@@ -154,7 +163,7 @@ class Mobsites_Blazor_SignaturePad extends SignaturePad {
     }
     preserveFullSignature(type) {
         this.fullSignaturePad.fromData(this.toData());
-        const dataURL = type.includes('jpeg') 
+        const dataURL = type.includes('jpeg')
             ? this.toDataURL_JPEG(this.dotNetObjOptions.contrastMode)
             : this.fullSignaturePad.toDataURL(type);
         this.fullSignaturePad.clear();
@@ -164,8 +173,7 @@ class Mobsites_Blazor_SignaturePad extends SignaturePad {
         const data = this.fullSignaturePad.toData();
         // It's necessary to use an opaque background color 
         // when saving image as JPEG and not in dark mode.
-        if (!contrastMode || contrastMode != 1)
-        {
+        if (!contrastMode || contrastMode != 1) {
             this.fullSignaturePad.backgroundColor = 'rgb(255, 255, 255)';
         }
         // Write signature back against opaque background.
@@ -222,14 +230,14 @@ class Mobsites_Blazor_SignaturePad extends SignaturePad {
         }
     }
     restoreSignatureState(key, useSession) {
-        const data = useSession 
+        const data = useSession
             ? sessionStorage.getItem(key)
             : localStorage.getItem(key);
         if (data) {
             const signature = JSON.parse(data);
             // Add current color to end of signature 
             // to correctly set pen color after restoring signature.
-            signature.push({ color: this.dotNetObjOptions.color, points: [{ time: 0, x: 0, y: 0 }]})
+            signature.push({ color: this.dotNetObjOptions.color, points: [{ time: 0, x: 0, y: 0 }] })
             // Restore signature.
             this.fromData(signature);
         }

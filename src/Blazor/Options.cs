@@ -24,9 +24,7 @@ namespace Mobsites.Blazor
             *   be accounted for there as not defined.
             *
             ***********************************************************************/
-
-            public bool Destroy { get; set; }
-
+            
             private SupportedSaveAsTypes? saveAsType;
 
             /// <summary>

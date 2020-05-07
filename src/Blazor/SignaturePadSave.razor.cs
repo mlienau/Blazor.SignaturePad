@@ -27,7 +27,7 @@ namespace Mobsites.Blazor
         /// <summary>
         /// Image type to save as. Defaults to png.
         /// </summary>
-        [Parameter] public SignaturePad.SupportedSaveAsTypes SaveAsType { get; set; }
+        [Parameter] public SignaturePad.SupportedSaveAsTypes? SaveAsType { get; set; }
 
         /// <summary>
         /// The foreground color for this component. Accepts any valid css color usage.
@@ -88,7 +88,7 @@ namespace Mobsites.Blazor
         /// <summary>
         /// Save signature to file as one of the supported image types.
         /// </summary>
-        public Task Save(SignaturePad.SupportedSaveAsTypes saveAsType) => this.Parent.Parent.Save(saveAsType);
+        public Task Save(SignaturePad.SupportedSaveAsTypes? saveAsType = null) => this.Parent.Parent.Save(saveAsType);
 
 
 

@@ -16,11 +16,8 @@
     <IsPackable>true</IsPackable>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>mobsites-logo.png</PackageIcon>
-    <PackageReleaseNotes>
-        Addressed multiple pads on same page leaving dangling javascript representations in memory on navigation from and back to page again. 
-        Cleaned up and refactored javascript.
-    </PackageReleaseNotes>
-    <PackageVersion>1.1.4</PackageVersion>
+    <PackageReleaseNotes>Moved away from dependency of internal id of dotnet obj ref in javascript to using index in store instead.</PackageReleaseNotes>
+    <PackageVersion>1.1.5</PackageVersion>
     <PackageTags>blazor;component;signature;pad;canvas;</PackageTags>
     <PackageProjectUrl>https://www.mobsites.com/blazor-signature-pad</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
