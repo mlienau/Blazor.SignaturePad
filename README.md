@@ -37,13 +37,7 @@ Now, not every aspect of his awesome javascript library has been ported over, an
 
 ## Getting Started
 
-1. Add [Nuget](https://www.nuget.org/packages/Mobsites.Blazor.SignaturePad/) package:
-
-```shell
-dotnet add package Mobsites.Blazor.SignaturePad
-```
-
-Next check out our new [docs](https://www.mobsites.com/blazor/signature-pad) to help you get started.
+Check out our new [docs](https://www.mobsites.com/blazor/signature-pad) to help you get started.
 
 ## Shout Out
 
