@@ -107,8 +107,8 @@ class Mobsites_Blazor_SignaturePad extends SignaturePad {
         this.dotNetObjOptions = options;
         // Create a second Signature Pad just to help preserve signature when saving.
         const canvas = document.createElement('canvas');
-        canvas.width = 700;
-        canvas.height = 350;
+        canvas.width = options.maxWidth;
+        canvas.height = options.maxHeight;
         this.fullSignaturePad = new SignaturePad(canvas);
         this.onEnd = function () {
             this.dotNetObjRef.invokeMethodAsync('SignatureChanged');

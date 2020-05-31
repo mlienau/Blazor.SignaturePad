@@ -16,17 +16,17 @@
     <IsPackable>true</IsPackable>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>mobsites-logo.png</PackageIcon>
-    <PackageReleaseNotes>Moved away from dependency of internal id of dotnet obj ref in javascript to using index in store instead.</PackageReleaseNotes>
-    <PackageVersion>1.1.5</PackageVersion>
+    <PackageReleaseNotes>Added dimension parameters. Updated dependencies.</PackageReleaseNotes>
+    <PackageVersion>1.1.6</PackageVersion>
     <PackageTags>blazor;component;signature;pad;canvas;</PackageTags>
-    <PackageProjectUrl>https://www.mobsites.com/blazor-signature-pad</PackageProjectUrl>
+    <PackageProjectUrl>https://www.mobsites.com/blazor/signature-pad</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Mobsites/Blazor.SignaturePad</RepositoryUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Mobsites.Blazor.BaseComponents" Version="1.0.2" />
+    <PackageReference Include="Mobsites.Blazor.BaseComponents" Version="1.0.3" />
   </ItemGroup>
 
   <ItemGroup>

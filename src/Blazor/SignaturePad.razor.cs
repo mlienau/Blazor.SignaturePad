@@ -65,6 +65,82 @@ namespace Mobsites.Blazor
                 }
             }
         }
+        
+        private int? maxWidth;
+
+        /// <summary>
+        /// The maximum width of the signature pad visually and internally for purposes of saving.
+        /// Defaults to a max of 700px;
+        /// </summary>
+        [Parameter]
+        public int? MaxWidth
+        {
+            get => maxWidth ?? 700;
+            set
+            {
+                if (value != null && value >= 0)
+                {
+                    maxWidth = value;
+                }
+            }
+        }
+
+        private int? maxHeight;
+
+        /// <summary>
+        /// The maximum height of the signature pad visually and internally for purposes of saving.
+        /// Defaults to a max of 460px;
+        /// </summary>
+        [Parameter]
+        public int? MaxHeight
+        {
+            get => maxHeight ?? 460;
+            set
+            {
+                if (value != null && value >= 0)
+                {
+                    maxHeight = value;
+                }
+            }
+        }
+
+        private int? minWidth;
+
+        /// <summary>
+        /// The minimum width of the signature pad visually and internally for purposes of saving.
+        /// Defaults to a max of 250px;
+        /// </summary>
+        [Parameter]
+        public int? MinWidth
+        {
+            get => minWidth ?? 250;
+            set
+            {
+                if (value != null && value >= 0)
+                {
+                    minWidth = value;
+                }
+            }
+        }
+
+        private int? minHeight;
+
+        /// <summary>
+        /// The minimum height of the signature pad visually and internally for purposes of saving.
+        /// Defaults to a max of 350px;
+        /// </summary>
+        [Parameter]
+        public int? MinHeight
+        {
+            get => minHeight ?? 350;
+            set
+            {
+                if (value != null && value >= 0)
+                {
+                    minHeight = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Image type to save as. Defaults to png.
@@ -303,7 +379,8 @@ namespace Mobsites.Blazor
         {
             var options = new Options
             {
-
+                MaxWidth = (int)MaxWidth,
+                MaxHeight = (int)MaxHeight
             };
 
             base.SetOptions(options);

@@ -5,9 +5,10 @@
     string backgroundColor = BackgroundMode == BackgroundModes.Image 
         ? $"background-color: {BackgroundColor ?? "white"};" 
         : null;
+    string dimensions = $"max-width: {MaxWidth}px;max-height: {MaxHeight}px;min-width: {MinWidth}px;min-height: {MinHeight}px;";
 }
 
-<div @ref="ElemRef" id="@id" class="signature-pad @Class" style="@Style @backgroundColor" @attributes="@ExtraAttributes">
+<div @ref="ElemRef" id="@id" class="signature-pad @Class" style="@Style @backgroundColor @dimensions" @attributes="@ExtraAttributes">
     <div class="signature-pad--body">
         @{
             string background = !string.IsNullOrWhiteSpace(Image) && BackgroundMode != BackgroundModes.Image

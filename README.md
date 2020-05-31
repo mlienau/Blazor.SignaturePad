@@ -29,7 +29,7 @@ Check out its source code [here](./samples).
 
 ## Design and Development
 
-The design and development of this Blazor component was heavily guided by Microsoft's [Steve Sanderson](https://blog.stevensanderson.com/). He outlines a superb approach to building and deploying a reusable component library in this [presentation](https://youtu.be/QnBYmTpugz0) and [example](https://github.com/SteveSandersonMS/presentation-2020-01-NdcBlazorComponentLibraries).
+The design and development of this Blazor component was influenced by Microsoft's [Steve Sanderson](https://blog.stevensanderson.com/). He outlines a superb approach to building and deploying a reusable component library in this [presentation](https://youtu.be/QnBYmTpugz0) and [example](https://github.com/SteveSandersonMS/presentation-2020-01-NdcBlazorComponentLibraries).
 
 As for the non-C# implementation of this component library, obviously the Signature Pad [docs](https://github.com/szimek/signature_pad) were consulted carefully. And it goes without saying (but I'm going to say it anyway), that Blazor Signature Pad would not be what it is...were it not for [Szymon Nowak](https://github.com/szimek)'s hard work beforehand.
 
@@ -38,7 +38,3 @@ Now, not every aspect of his awesome javascript library has been ported over, an
 ## Getting Started
 
 Check out our new [docs](https://www.mobsites.com/blazor/signature-pad) to help you get started.
-
-## Shout Out
-
-I want to thank [Mike](https://github.com/michaelfw2020) for raising this [issue](https://github.com/Mobsites/Blazor.SignaturePad/issues/2) concerning complex signature failures on Blazor Server when calling `toDataUrl()` method and more importantly his contribution to address this, which was happily merged into the source.
