@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/Mobsites-US/Blazor%20Signature%20Pad/_apis/build/status/Build?branchName=master)](https://dev.azure.com/Mobsites-US/Blazor%20Signature%20Pad/_build/latest?definitionId=18&branchName=master)
+![Nuget](https://img.shields.io/nuget/v/Mobsites.Blazor.SignaturePad) [![Build Status](https://dev.azure.com/Mobsites-US/Blazor%20Signature%20Pad/_apis/build/status/Build?branchName=master)](https://dev.azure.com/Mobsites-US/Blazor%20Signature%20Pad/_build/latest?definitionId=18&branchName=master)
 
 # Blazor Signature Pad
 
@@ -25,7 +25,7 @@ Check out its source code [here](./samples).
 
 ###### .NETStandard 2.0
 
-* Mobsites.Blazor.BaseComponents (>= 1.0.2)
+* Mobsites.Blazor.BaseComponents (>= 1.0.3)
 
 ## Design and Development
 
