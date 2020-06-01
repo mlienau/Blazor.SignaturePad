@@ -1,8 +1,8 @@
-![Nuget](https://img.shields.io/nuget/v/Mobsites.Blazor.SignaturePad) [![Build Status](https://dev.azure.com/Mobsites-US/Blazor%20Signature%20Pad/_apis/build/status/Build?branchName=master)](https://dev.azure.com/Mobsites-US/Blazor%20Signature%20Pad/_build/latest?definitionId=18&branchName=master)
-
 # Blazor Signature Pad
 
 by <a href="https://www.mobsites.com"><img align="center" src="./src/assets/mobsites-logo.png" width="36" height="36" style="padding-top: 20px;" />obsites</a>
+
+![Nuget](https://img.shields.io/nuget/v/Mobsites.Blazor.SignaturePad) ![Nuget](https://img.shields.io/nuget/dt/Mobsites.Blazor.SignaturePad) [![Build Status](https://dev.azure.com/Mobsites-US/Blazor%20Signature%20Pad/_apis/build/status/Build?branchName=master)](https://dev.azure.com/Mobsites-US/Blazor%20Signature%20Pad/_build/latest?definitionId=18&branchName=master)
 
 A Blazor UI component that utilizes [Szymon Nowak](https://github.com/szimek)'s Signature Pad javascript library to implement smooth signature drawing on a HTML5 canvas.
 
