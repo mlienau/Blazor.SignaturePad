@@ -7,6 +7,7 @@
         <SignaturePad @ref="signature" 
             MinWidth="300"
             MinHeight="300"
+            onmousedown="Mobsites.Blazor.SignaturePads.resizeCanvas();" 
             Color="black">
             <SignaturePadFooter FooterDirective="@("Sign Please")" />
         </SignaturePad>  
@@ -17,7 +18,7 @@
         <MatIconButton OnClick="@(e => { dialogIsOpen = false; })" Icon="@MatIconNames.Close"/>
     </MatDialogActions>
 </MatDialog>
-<MatButton onblur="Mobsites.Blazor.SignaturePads.resizeCanvas();" OnClick="@(e => { dialogIsOpen = true; })" Class="mb-5">Open Signature Pad In Modal</MatButton>
+<MatButton OnClick="@(e => { dialogIsOpen = true; })" Class="mb-5">Open Signature Pad In Modal</MatButton>
 
 @code
 {
