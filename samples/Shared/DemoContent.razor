@@ -17,7 +17,7 @@
 <div class="row mb-3">
     <div class="col-12 col-xl-6 mb-3">
         <SignaturePad KeepState
-                      Id="Demo"
+                      Id="Demo-x"
                       Color="#5c2d91"
                       @bind-BackgroundMode="BackgroundMode"
                       @bind-BackgroundColorDirection="BackgroundColorDirection"
@@ -145,7 +145,7 @@
         dataURL = await signaturePad.ToDataURL(signatureType);
     }
 
-    private BackgroundModes backgroundMode = BackgroundModes.Gradient;
+    private BackgroundModes backgroundMode = BackgroundModes.Light;
     public BackgroundModes BackgroundMode
     {
         get => backgroundMode; 
