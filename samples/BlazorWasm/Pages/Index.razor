@@ -7,8 +7,8 @@
         <SignaturePad @ref="signature" 
             MinWidth="300"
             MinHeight="300"
-            onmousedown="(function () { Mobsites.Blazor.SignaturePads.resizeCanvas(); }())" 
-            ontouchstart="(function (evt) { evt.preventDefault(); Mobsites.Blazor.SignaturePads.resizeCanvas(); }())"
+            onfocus="Mobsites.Blazor.SignaturePads.resizeCanvas();"
+            tabindex="1"
             Color="black">
             <SignaturePadFooter FooterDirective="@("Sign Please")" />
         </SignaturePad>  
