@@ -1,3 +1,26 @@
-﻿@page "/"
+@page "/"
 
 <DemoContent />
+
+<MatDialog @bind-IsOpen="@dialogIsOpen">
+    <MatDialogContent>
+        <SignaturePad @ref="signature" 
+            MinWidth="300"
+            MinHeight="300"
+            Color="black">
+            <SignaturePadFooter FooterDirective="@("Sign Please")" />
+        </SignaturePad>  
+    </MatDialogContent>
+    <MatDialogActions>
+        <MatButton OnClick="@(() => signature.Clear())">Clear</MatButton>
+        <MatButton OnClick="@(() => signature.Save(SignaturePad.SupportedSaveAsTypes.png))">Save</MatButton>
+        <MatIconButton OnClick="@(e => { dialogIsOpen = false; })" Icon="@MatIconNames.Close"/>
+    </MatDialogActions>
+</MatDialog>
+<MatButton onblur="Mobsites.Blazor.SignaturePads.resizeCanvas();" OnClick="@(e => { dialogIsOpen = true; })" Class="mb-5">Open Signature Pad In Modal</MatButton>
+
+@code
+{
+    bool dialogIsOpen = false;
+    SignaturePad signature;
+}
