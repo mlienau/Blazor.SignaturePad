@@ -155,8 +155,17 @@ namespace Mobsites.Blazor
         /// <summary>
         /// Callback that is fired when a signature stroke finishes or is removed, or when the signature is cleared.
         /// </summary>
-        [Parameter]
-        public EventCallback<ChangeEventArgs> OnSignatureChange { get; set; }
+        [Parameter] public EventCallback<ChangeEventArgs> OnSignatureChange { get; set; }
+
+        /// <summary>
+        /// Whether <see cref="SignaturePad" /> is used inside a popup modal.
+        /// </summary>
+        [Parameter] public bool UsedInModal { get; set; }
+
+        /// <summary>
+        /// Tab index for focusing <see cref="SignaturePad" /> among other tabable elements on page or in form.
+        /// </summary>
+        [Parameter] public int? TabIndex { get; set; } = null;
 
         /// <summary>
         /// Clear all state for this UI component and any of its dependents from browser storage.
@@ -274,7 +283,7 @@ namespace Mobsites.Blazor
         /// <summary>
         /// Whether component environment is Blazor WASM or Server.
         /// </summary>
-        internal bool IsWASM => RuntimeInformation.IsOSPlatform(OSPlatform.Create("WEBASSEMBLY"));
+        internal bool IsWASM => RuntimeInformation.IsOSPlatform(OSPlatform.Create("BROWSER"));
 
         private DotNetObjectReference<SignaturePad> self;
 

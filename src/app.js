@@ -140,7 +140,7 @@ class Mobsites_Blazor_SignaturePad extends SignaturePad {
     }
     update(options) {
         this.dotNetObjOptions = options;
-        this.penColor = options.color ? options.color : null;
+        this.penColor = options.color ? options.color : 'black';
     }
     _toDataURL(type) {
         var dataURL = null;
@@ -189,7 +189,7 @@ class Mobsites_Blazor_SignaturePad extends SignaturePad {
         this.dotNetObjRef.invokeMethodAsync('ChangeColor', color);
     }
     _clear() {
-        super.clear();
+        this.clear();
         this.dotNetObjRef.invokeMethodAsync('SignatureChanged');
     }
     undo() {

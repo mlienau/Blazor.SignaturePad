@@ -6,25 +6,65 @@
         ? $"background-color: {BackgroundColor ?? "white"};" 
         : null;
     string dimensions = $"max-width: {MaxWidth}px;max-height: {MaxHeight}px;min-width: {MinWidth}px;min-height: {MinHeight}px;";
+    string tabIndex = TabIndex is null
+        ? "1"
+        : TabIndex.ToString();
 }
 
-<div @ref="ElemRef" id="@id" class="signature-pad @Class" style="@Style @backgroundColor @dimensions" @attributes="@ExtraAttributes">
-    <div class="signature-pad--body">
-        @{
-            string background = !string.IsNullOrWhiteSpace(Image) && BackgroundMode != BackgroundModes.Image
-                ? $"background: url({Image}) center / {ImageWidth}px {ImageHeight}px no-repeat;"
-                : null;
+@if (UsedInModal)
+{
+    <div @ref="ElemRef" 
+        id="@id" 
+        onfocus="Mobsites.Blazor.SignaturePads.resizeCanvas();"
+        tabindex="@tabIndex"
+        class="signature-pad @Class" 
+        style="@Style @backgroundColor @dimensions" 
+        @attributes="@ExtraAttributes">
+        <div class="signature-pad--body">
+            @{
+                string background = !string.IsNullOrWhiteSpace(Image) && BackgroundMode != BackgroundModes.Image
+                    ? $"background: url({Image}) center / {ImageWidth}px {ImageHeight}px no-repeat;"
+                    : null;
+            }
+            <canvas @ref="Canvas" id="signature-pad--canvas" style="@background"></canvas>
+        </div>
+        @if (ChildContent is null)
+        {
+            <div style="padding-bottom: 8px;"></div>
         }
-        <canvas @ref="Canvas" id="signature-pad--canvas" style="@background"></canvas>
+        else
+        {
+            <CascadingValue Value="this">
+                @ChildContent
+            </CascadingValue>
+        }
     </div>
-    @if (ChildContent is null)
-    {
-        <div style="padding-bottom: 8px;"></div>
-    }
-    else
-    {
-        <CascadingValue Value="this">
-            @ChildContent
-        </CascadingValue>
-    }
-</div>
+}
+else
+{
+    <div @ref="ElemRef" 
+        id="@id" 
+        tabindex="@TabIndex"
+        class="signature-pad @Class" 
+        style="@Style @backgroundColor @dimensions" 
+        @attributes="@ExtraAttributes">
+        <div class="signature-pad--body">
+            @{
+                string background = !string.IsNullOrWhiteSpace(Image) && BackgroundMode != BackgroundModes.Image
+                    ? $"background: url({Image}) center / {ImageWidth}px {ImageHeight}px no-repeat;"
+                    : null;
+            }
+            <canvas @ref="Canvas" id="signature-pad--canvas" style="@background"></canvas>
+        </div>
+        @if (ChildContent is null)
+        {
+            <div style="padding-bottom: 8px;"></div>
+        }
+        else
+        {
+            <CascadingValue Value="this">
+                @ChildContent
+            </CascadingValue>
+        }
+    </div>
+}

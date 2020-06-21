@@ -4,12 +4,10 @@
 
 <MatDialog @bind-IsOpen="@dialogIsOpen">
     <MatDialogContent>
-        <SignaturePad @ref="signature" 
+        <SignaturePad @ref="signature"
+            UsedInModal 
             MinWidth="300"
-            MinHeight="300"
-            onfocus="Mobsites.Blazor.SignaturePads.resizeCanvas();"
-            tabindex="1"
-            Color="black">
+            MinHeight="300">
             <SignaturePadFooter FooterDirective="@("Sign Please")" />
         </SignaturePad>  
     </MatDialogContent>
