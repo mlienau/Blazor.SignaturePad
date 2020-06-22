@@ -11,3 +11,4 @@ node_modules
 /src/.vs/Blazor.SignaturePad/DesignTimeBuild/.dtbcache.v2
 /src/Blazor.SignaturePad.csproj.vspscc
 /src/Blazor.SignaturePad.sln
+**/dataURL.txt

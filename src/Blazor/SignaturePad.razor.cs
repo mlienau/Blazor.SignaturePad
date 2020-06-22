@@ -168,6 +168,13 @@ namespace Mobsites.Blazor
         [Parameter] public int? TabIndex { get; set; } = null;
 
         /// <summary>
+        /// Sets the <see cref="SignaturePad" /> in a Blazor WASM app with a previously drawn signature that was saved as a dataURL.
+        /// NOTE: This only works in Blazor WASM (for now) and does not populate the internal data structure that represents drawn signature,
+        /// so certain features, such as undoing a stroke, will no longer work on the redrawn signature.
+        /// </summary>
+        [Parameter] public string DataURL { private get; set; }
+
+        /// <summary>
         /// Clear all state for this UI component and any of its dependents from browser storage.
         /// </summary>
         public Task ClearState() => this.ClearState<SignaturePad, Options>().AsTask();
@@ -356,6 +363,11 @@ namespace Mobsites.Blazor
                     this.Canvas
                 },
                 options);
+
+            if (!string.IsNullOrWhiteSpace(this.DataURL) && this.IsWASM)
+            {
+                await this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePads.fromDataURL", Index, this.DataURL);
+            }
 
             await this.Save<SignaturePad, Options>(options);
         }

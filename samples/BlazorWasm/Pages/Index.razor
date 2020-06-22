@@ -1,4 +1,5 @@
 @page "/"
+@inject HttpClient Http
 
 <DemoContent />
 
@@ -19,8 +20,28 @@
 </MatDialog>
 <MatButton OnClick="@(e => { dialogIsOpen = true; })" Class="mb-5">Open Signature Pad In Modal</MatButton>
 
+<br />
+@if (!string.IsNullOrEmpty(dataURL))
+{
+    <SignaturePad DataURL="@dataURL">
+        <SignaturePadFooter FooterDirective="Sign above">
+                <SignaturePadPen Image="_content/Shared/pen.png" />
+                <SignaturePadClear Image="_content/Shared/clear.png" />
+                <SignaturePadUndo Image="_content/Shared/undo.png" />
+                <SignaturePadSave Image="_content/Shared/save.png" />
+            </SignaturePadFooter>
+    </SignaturePad> 
+} 
+
 @code
 {
     bool dialogIsOpen = false;
     SignaturePad signature;
+
+    string dataURL;
+
+    protected override async Task OnInitializedAsync()
+    {
+        dataURL = await Http.GetStringAsync("sample-data/dataURL.txt");
+    }
 }

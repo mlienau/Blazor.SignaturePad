@@ -38,6 +38,7 @@ namespace Mobsites.Blazor
 
             public int MaxWidth { get; set; }
             public int MaxHeight { get; set; }
+            public bool UseLightBackGround { get; set; }
         }
     }
 }
