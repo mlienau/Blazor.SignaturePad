@@ -16,8 +16,8 @@
     <IsPackable>true</IsPackable>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>mobsites-logo.png</PackageIcon>
-    <PackageReleaseNotes>Updated platform detection to new value check. Fixed missing default pen color bug when color not set as attribute. Added attribute support for popup modal use cases. Updated dependencies.</PackageReleaseNotes>
-    <PackageVersion>1.1.7</PackageVersion>
+    <PackageReleaseNotes>Changed reliance from the internal data structure used by underlying js library to the base64 data URL instead.</PackageReleaseNotes>
+    <PackageVersion>2.0.0-preview1</PackageVersion>
     <PackageTags>blazor;component;signature;pad;canvas;</PackageTags>
     <PackageProjectUrl>https://www.mobsites.com/blazor/signature-pad</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
