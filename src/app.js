@@ -17,7 +17,6 @@ window.Mobsites.Blazor.SignaturePads = {
         try {
             const index = this.add(new Mobsites_Blazor_SignaturePad(dotNetObjRef, elemRefs, options));
             dotNetObjRef.invokeMethodAsync('SetIndex', index);
-            
             this.store[index].resizeCanvas();
             this.initResizeEvent();
             dotNetObjRef.invokeMethodAsync('RestoreSignatureState');
@@ -116,26 +115,17 @@ class Mobsites_Blazor_SignaturePad extends SignaturePad {
     resizeCanvas() {
         // Store signature in memory before resizing so as not to lose it.
         const dataURL = this.toDataURL();
-
-        // When zoomed out to less than 100%, for some very strange reason,
-        // some browsers report devicePixelRatio as less than 1
-        // and only part of the canvas is cleared then.
-        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        
+        const ratio = 1;
 
         // This part causes the canvas to be cleared
         this.canvas.width = this.canvas.offsetWidth * ratio;
         this.canvas.height = this.canvas.offsetHeight * ratio;
         this.canvas.getContext('2d').scale(ratio, ratio);
-
-        // This library does not listen for canvas changes, so after the canvas is automatically
-        // cleared by the browser, SignaturePad#isEmpty might still return false, even though the
-        // canvas looks empty, because the internal data of this library wasn't cleared. To make sure
-        // that the state of this library is consistent with visual state of the canvas, you
-        // have to clear it manually.
-        // this.clear();
+        this.clear();
 
         // Write signature back.
-        this.fromDataURL(dataURL);
+        this.fromDataURL(dataURL, { ratio: ratio });
     }
     update(options) {
         this.dotNetObjOptions = options;
@@ -161,11 +151,7 @@ class Mobsites_Blazor_SignaturePad extends SignaturePad {
         return dataURL;
     }
     _fromDataURL(dataURL) {
-        this.fromDataURL(dataURL, { 
-            ratio: Math.max(window.devicePixelRatio || 1, 1),
-            width: this.dotNetObjOptions.maxWidth, 
-            height: this.dotNetObjOptions.maxHeight 
-        });
+        this.fromDataURL(dataURL, { ratio: 1 });
     }
     toDataURL_JPEG(contrastMode) {
         var dataURL = '';
@@ -233,11 +219,7 @@ class Mobsites_Blazor_SignaturePad extends SignaturePad {
             ? sessionStorage.getItem(key)
             : localStorage.getItem(key);
         if (dataURL) {
-            this.fromDataURL(dataURL, { 
-                ratio: Math.max(window.devicePixelRatio || 1, 1),
-                width: this.canvas.width, 
-                height: this.canvas.height 
-            });
+            this.fromDataURL(dataURL, { ratio: 1 });
         }
     }
 }

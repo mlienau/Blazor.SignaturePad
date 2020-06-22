@@ -42,6 +42,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        dataURL = await Http.GetStringAsync("sample-data/dataURL.txt");
+        try
+        {
+            dataURL = await Http.GetStringAsync("sample-data/dataURL.txt");
+        }
+        catch (System.Exception)
+        {
+            
+        }
     }
 }

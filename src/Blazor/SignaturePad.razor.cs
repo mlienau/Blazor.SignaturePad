@@ -227,6 +227,29 @@ namespace Mobsites.Blazor
             .AsTask();
 
         /// <summary>
+        /// Undo last signature stroke.
+        /// </summary>
+        public Task FromDataURL(string dataURL)
+        {
+            if (string.IsNullOrEmpty(dataURL))
+            {
+                throw new ArgumentNullException(nameof(dataURL));
+            }
+            else if (!dataURL.StartsWith("data:image"))
+            {
+                throw new ArithmeticException("Must be a valid image data URL.");
+            }
+            else if (!this.IsWASM)
+            {
+                throw new NotSupportedException("This feature is currently not supported with Blazor Server.");
+            }
+            else
+            {
+                return this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePads.fromDataURL", Index, dataURL).AsTask();
+            }
+        }
+
+        /// <summary>
         /// Invoked from a javascript when pen color is changed.
         /// For internal use only. ChangePenColor() is for external use.
         /// </summary>
@@ -364,11 +387,11 @@ namespace Mobsites.Blazor
                 },
                 options);
 
-            if (!string.IsNullOrWhiteSpace(this.DataURL) && this.IsWASM)
+            if (!string.IsNullOrEmpty(this.DataURL))
             {
-                await this.jsRuntime.InvokeVoidAsync("Mobsites.Blazor.SignaturePads.fromDataURL", Index, this.DataURL);
+                await this.FromDataURL(this.DataURL);
             }
-
+            
             await this.Save<SignaturePad, Options>(options);
         }
 
